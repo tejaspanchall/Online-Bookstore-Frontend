@@ -8,85 +8,105 @@ export default function Navbar() {
   const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const validateSession = async () => {
-      try {
-        const response = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php', {
+  const validateSession = async () => {
+    try {
+      // First validate the session
+      const sessionResponse = await fetch(
+        'https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php',
+        {
           credentials: 'include',
           headers: {
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
           }
-        });
-
-        if (response.ok) {
-          setIsLoggedIn(true);
-          localStorage.setItem('user', 'true');
-          
-          const roleResponse = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/get-role.php', {
-            credentials: 'include',
-            headers: {
-              'Accept': 'application/json'
-            }
-          });
-          
-          if (roleResponse.ok) {
-            const data = await roleResponse.json();
-            setUserRole(data.role);
-          }
-        } else {
-          localStorage.removeItem('user');
-          setIsLoggedIn(false);
-          setUserRole(null);
         }
-      } catch (error) {
-        console.error('Session validation error:', error);
+      );
+
+      if (!sessionResponse.ok) {
         localStorage.removeItem('user');
         setIsLoggedIn(false);
         setUserRole(null);
-      } finally {
         setIsLoading(false);
+        return;
       }
-    };
 
-    validateSession();
-
-    const handleStorageChange = (e) => {
-      if (e.key === 'user') {
-        setIsLoggedIn(!!e.newValue);
-        if (!e.newValue) {
-          setUserRole(null);
+      // If session is valid, get the user role
+      const roleResponse = await fetch(
+        'https://online-bookstore-backend-production.up.railway.app/auth/get-role.php',
+        {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
         }
+      );
+      
+      if (roleResponse.ok) {
+        const data = await roleResponse.json();
+        setIsLoggedIn(true);
+        setUserRole(data.role);
+        localStorage.setItem('user', 'true');
+      } else {
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+        setUserRole(null);
       }
+    } catch (error) {
+      console.error('Session validation error:', error);
+      localStorage.removeItem('user');
+      setIsLoggedIn(false);
+      setUserRole(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    validateSession();
+  }, []);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const handleAuthChange = () => {
+      validateSession();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('loginStateChange', validateSession);
+    window.addEventListener('storage', handleAuthChange);
+    window.addEventListener('loginStateChange', handleAuthChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('loginStateChange', validateSession);
+      window.removeEventListener('storage', handleAuthChange);
+      window.removeEventListener('loginStateChange', handleAuthChange);
     };
   }, []);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/logout.php', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json'
+      const response = await fetch(
+        'https://online-bookstore-backend-production.up.railway.app/auth/logout.php',
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
   
       if (response.ok) {
         localStorage.removeItem('user');
         setIsLoggedIn(false);
         setUserRole(null);
         
+        // Dispatch events to notify other tabs
         window.dispatchEvent(new Event('storage'));
         window.dispatchEvent(new Event('loginStateChange'));
         
-        setTimeout(() => navigate('/login'), 50);
+        navigate('/login');
+      } else {
+        console.error('Logout failed:', await response.text());
       }
     } catch (error) {
       console.error('Logout failed:', error);
