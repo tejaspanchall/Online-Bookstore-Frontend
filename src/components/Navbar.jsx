@@ -8,6 +8,48 @@ export default function Navbar() {
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
+    const validateSession = async () => {
+      try {
+        const response = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php', {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          setIsLoggedIn(true);
+          // Fetch role only if session is valid
+          const roleResponse = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/get-role.php', {
+            credentials: 'include',
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (roleResponse.ok) {
+            const data = await roleResponse.json();
+            setUserRole(data.role);
+          }
+        } else {
+          // Clear local storage if session is invalid
+          localStorage.removeItem('user');
+          setIsLoggedIn(false);
+          setUserRole(null);
+        }
+      } catch (error) {
+        console.error('Session validation error:', error);
+        setIsLoggedIn(false);
+        setUserRole(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateSession();
+  }, []);
+
+  useEffect(() => {
     console.log('Auth state changed. Is logged in:', isLoggedIn);
   }, [isLoggedIn]);
 
