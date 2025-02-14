@@ -31,7 +31,7 @@ export default function Navbar() {
     const fetchUserRole = async () => {
       if (isLoggedIn) {
         try {
-          const response = await fetch('https://online-bookstore-backend-production.up.railway.app/api/auth/get-role.php', {
+          const response = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/get-role.php', {
             credentials: 'include'
           });
           if (response.ok) {
@@ -49,7 +49,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('https://online-bookstore-backend-production.up.railway.app/api/auth/logout.php', {
+      const response = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/logout.php', {
         method: 'POST',
         credentials: 'include', 
       });
