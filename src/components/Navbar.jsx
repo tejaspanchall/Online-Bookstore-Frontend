@@ -13,6 +13,7 @@ export default function Navbar() {
       const sessionResponse = await fetch(
         'https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php',
         {
+          method: 'GET',
           credentials: 'include',
           headers: {
             'Accept': 'application/json',
@@ -29,41 +30,22 @@ export default function Navbar() {
         return;
       }
 
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
+      const data = await sessionResponse.json();
       
-      if (userData && Object.keys(userData).length > 0) {
-        const roleResponse = await fetch(
-          'https://online-bookstore-backend-production.up.railway.app/auth/get-role.php',
-          {
-            credentials: 'include',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-        
-        if (roleResponse.ok) {
-          const { role } = await roleResponse.json();
-          setIsLoggedIn(true);
-          setUserRole(role);
-          
-          // Update stored user data with role
-          localStorage.setItem('user', JSON.stringify({ ...userData, role }));
-        } else {
-          setIsLoggedIn(false);
-          setUserRole(null);
-          localStorage.removeItem('user');
-        }
+      if (data.status === 'valid' && data.user) {
+        setIsLoggedIn(true);
+        setUserRole(data.user.role);
+        localStorage.setItem('user', JSON.stringify(data.user));
       } else {
+        localStorage.removeItem('user');
         setIsLoggedIn(false);
         setUserRole(null);
       }
     } catch (error) {
       console.error('Session validation error:', error);
+      localStorage.removeItem('user');
       setIsLoggedIn(false);
       setUserRole(null);
-      localStorage.removeItem('user');
     } finally {
       setIsLoading(false);
     }
@@ -78,13 +60,8 @@ export default function Navbar() {
       validateSession();
     };
 
-    window.addEventListener('storage', handleAuthChange);
     window.addEventListener('loginStateChange', handleAuthChange);
-
-    return () => {
-      window.removeEventListener('storage', handleAuthChange);
-      window.removeEventListener('loginStateChange', handleAuthChange);
-    };
+    return () => window.removeEventListener('loginStateChange', handleAuthChange);
   }, []);
 
   const handleLogout = async () => {
@@ -105,24 +82,20 @@ export default function Navbar() {
         localStorage.removeItem('user');
         setIsLoggedIn(false);
         setUserRole(null);
-        
-        window.dispatchEvent(new Event('storage'));
         window.dispatchEvent(new Event('loginStateChange'));
-        
         navigate('/login');
-      } else {
-        console.error('Logout failed:', await response.text());
       }
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <nav className="navbar navbar-expand-lg navbar-dark custom-navbar py-3">
         <div className="container">
-          <Link to="/catalog" className="navbar-brand fw-bold fs-4">
+          <Link to="/" className="navbar-brand fw-bold fs-4">
             <JournalBookmark className="me-2" />
             BookCafe
           </Link>
@@ -134,7 +107,7 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark custom-navbar py-3">
       <div className="container">
-        <Link to="/catalog" className="navbar-brand fw-bold fs-4">
+        <Link to="/" className="navbar-brand fw-bold fs-4">
           <JournalBookmark className="me-2" />
           BookCafe
         </Link>
@@ -152,6 +125,14 @@ export default function Navbar() {
           <ul className="navbar-nav ms-auto align-items-center gap-3">
             {isLoggedIn ? (
               <>
+                <li className="nav-item">
+                  <NavLink 
+                    to="/catalog" 
+                    className="nav-link d-flex align-items-center gap-1"
+                  >
+                    Browse Books
+                  </NavLink>
+                </li>
                 <li className="nav-item">
                   <NavLink 
                     to="/my-library" 
@@ -182,6 +163,11 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                <li className="nav-item">
+                  <NavLink to="/catalog" className="nav-link">
+                    Browse Books
+                  </NavLink>
+                </li>
                 <li className="nav-item">
                   <NavLink to="/login" className="nav-link">
                     Login
