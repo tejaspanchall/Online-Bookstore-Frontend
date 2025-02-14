@@ -127,14 +127,6 @@ export default function Navbar() {
               <>
                 <li className="nav-item">
                   <NavLink 
-                    to="/catalog" 
-                    className="nav-link d-flex align-items-center gap-1"
-                  >
-                    Browse Books
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink 
                     to="/my-library" 
                     className="nav-link d-flex align-items-center gap-1"
                   >
@@ -163,11 +155,6 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <li className="nav-item">
-                  <NavLink to="/catalog" className="nav-link">
-                    Browse Books
-                  </NavLink>
-                </li>
                 <li className="nav-item">
                   <NavLink to="/login" className="nav-link">
                     Login
