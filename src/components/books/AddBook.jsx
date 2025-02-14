@@ -17,7 +17,7 @@ export default function AddBook() {
     const checkSession = async () => {
       try {
         const res = await fetch(
-          'https://backend-production-5a9b.up.railway.app/api/books/add.php',
+          'https://online-bookstore-backend-production.up.railway.app/api/books/add.php',
           {
             method: 'GET',
             credentials: 'include',
@@ -58,7 +58,7 @@ export default function AddBook() {
 
     try {
       const res = await fetch(
-        'https://backend-production-5a9b.up.railway.app/api/books/add.php',
+        'https://online-bookstore-backend-production.up.railway.app/api/books/add.php',
         {
           method: 'POST',
           credentials: 'include',

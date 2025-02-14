@@ -22,7 +22,7 @@ export default function Register() {
     }
   
     try {
-      const res = await fetch('https://backend-production-5a9b.up.railway.app/api/auth/register.php', {
+      const res = await fetch('https://online-bookstore-backend-production.up.railway.app/api/auth/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

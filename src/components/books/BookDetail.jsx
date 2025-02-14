@@ -16,7 +16,7 @@ export default function BookDetail() {
   const fetchBook = async () => {
     try {
       const res = await fetch(
-        `https://backend-production-5a9b.up.railway.app/api/books/get-books.php?id=${id}`,
+        `https://online-bookstore-backend-production.up.railway.app/api/books/get-books.php?id=${id}`,
         {
           credentials: "include",
         }
@@ -41,7 +41,7 @@ export default function BookDetail() {
   const fetchLibraryStatus = async () => {
     try {
       const res = await fetch(
-        "https://backend-production-5a9b.up.railway.app/api/books/get-library.php",
+        "https://online-bookstore-backend-production.up.railway.app/api/books/get-library.php",
         {
           method: "GET",
           credentials: "include",
@@ -65,7 +65,7 @@ export default function BookDetail() {
 
   const fetchUserRole = async () => {
     try {
-      const res = await fetch('https://backend-production-5a9b.up.railway.app/api/auth/get-role.php', {
+      const res = await fetch('https://online-bookstore-backend-production.up.railway.app/api/auth/get-role.php', {
         credentials: 'include'
       });
       if (res.ok) {
@@ -131,7 +131,7 @@ export default function BookDetail() {
 
     try {
       const res = await fetch(
-        "https://backend-production-5a9b.up.railway.app/api/books/update-book.php",
+        "https://online-bookstore-backend-production.up.railway.app/api/books/update-book.php",
         {
           method: "POST",
           credentials: "include",
@@ -159,7 +159,7 @@ export default function BookDetail() {
   const handleAddToLibrary = async () => {
     try {
       const res = await fetch(
-        "https://backend-production-5a9b.up.railway.app/api/books/my-library.php",
+        "https://online-bookstore-backend-production.up.railway.app/api/books/my-library.php",
         {
           method: "POST",
           credentials: "include",
@@ -189,7 +189,7 @@ export default function BookDetail() {
   const handleRemoveFromLibrary = async () => {
     try {
       const res = await fetch(
-        "https://backend-production-5a9b.up.railway.app/api/books/remove-from-library.php",
+        "https://online-bookstore-backend-production.up.railway.app/api/books/remove-from-library.php",
         {
           method: "POST",
           credentials: "include",
@@ -215,7 +215,7 @@ export default function BookDetail() {
     if (window.confirm("Are you sure you want to delete this book?")) {
       try {
         const res = await fetch(
-          "https://backend-production-5a9b.up.railway.app/api/books/delete-book.php",
+          "https://online-bookstore-backend-production.up.railway.app/api/books/delete-book.php",
           {
             method: "POST",
             credentials: "include",
