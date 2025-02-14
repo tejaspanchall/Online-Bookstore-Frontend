@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+body {
+  @apply bg-dark text-slate-100;
+}
+
+/* Smooth transitions */
+button, a, input[type="submit"] {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Custom form styles */
+input, textarea, select {
+  @apply bg-dark-2 border border-dark-3 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-primary hover:bg-secondary text-white font-medium rounded-lg px-6 py-3 flex items-center justify-center gap-2;
+}
+
+/* Card hover effect */
+.card-hover {
+  @apply transition-transform duration-200 hover:scale-[1.02];
+}
