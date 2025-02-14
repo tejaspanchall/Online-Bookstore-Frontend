@@ -10,7 +10,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/login.php', {
+      const loginRes = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -20,17 +20,37 @@ export default function Login() {
         })
       });
 
-      const data = await res.json();
+      const loginData = await loginRes.json();
       
-      if (!res.ok) {
-        setError(data.error || 'Login failed');
+      if (!loginRes.ok) {
+        setError(loginData.error || 'Login failed');
         return;
       }
 
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // After successful login, get user role
+      const roleRes = await fetch(
+        'https://online-bookstore-backend-production.up.railway.app/auth/get-role.php',
+        {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (roleRes.ok) {
+        const roleData = await roleRes.json();
+        const userData = {
+          ...loginData.user,
+          role: roleData.role
+        };
+        localStorage.setItem('user', JSON.stringify(userData));
+      } else {
+        localStorage.setItem('user', JSON.stringify(loginData.user));
+      }
       
       window.dispatchEvent(new Event('loginStateChange'));
-      
       navigate('/catalog');
       
     } catch (error) {

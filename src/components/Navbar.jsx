@@ -10,7 +10,6 @@ export default function Navbar() {
 
   const validateSession = async () => {
     try {
-      // First validate the session
       const sessionResponse = await fetch(
         'https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php',
         {
@@ -30,33 +29,41 @@ export default function Navbar() {
         return;
       }
 
-      // If session is valid, get the user role
-      const roleResponse = await fetch(
-        'https://online-bookstore-backend-production.up.railway.app/auth/get-role.php',
-        {
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      const userData = JSON.parse(localStorage.getItem('user') || '{}');
       
-      if (roleResponse.ok) {
-        const data = await roleResponse.json();
-        setIsLoggedIn(true);
-        setUserRole(data.role);
-        localStorage.setItem('user', 'true');
+      if (userData && Object.keys(userData).length > 0) {
+        const roleResponse = await fetch(
+          'https://online-bookstore-backend-production.up.railway.app/auth/get-role.php',
+          {
+            credentials: 'include',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        if (roleResponse.ok) {
+          const { role } = await roleResponse.json();
+          setIsLoggedIn(true);
+          setUserRole(role);
+          
+          // Update stored user data with role
+          localStorage.setItem('user', JSON.stringify({ ...userData, role }));
+        } else {
+          setIsLoggedIn(false);
+          setUserRole(null);
+          localStorage.removeItem('user');
+        }
       } else {
-        localStorage.removeItem('user');
         setIsLoggedIn(false);
         setUserRole(null);
       }
     } catch (error) {
       console.error('Session validation error:', error);
-      localStorage.removeItem('user');
       setIsLoggedIn(false);
       setUserRole(null);
+      localStorage.removeItem('user');
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +73,6 @@ export default function Navbar() {
     validateSession();
   }, []);
 
-  // Listen for auth state changes
   useEffect(() => {
     const handleAuthChange = () => {
       validateSession();
@@ -100,7 +106,6 @@ export default function Navbar() {
         setIsLoggedIn(false);
         setUserRole(null);
         
-        // Dispatch events to notify other tabs
         window.dispatchEvent(new Event('storage'));
         window.dispatchEvent(new Event('loginStateChange'));
         
