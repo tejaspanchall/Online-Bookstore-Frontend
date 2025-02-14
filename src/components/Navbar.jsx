@@ -66,31 +66,26 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(
-        'https://online-bookstore-backend-production.up.railway.app/auth/logout.php',
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+      const response = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/logout.php', {
+        method: 'POST',
+        credentials: 'include', 
+      });
   
       if (response.ok) {
         localStorage.removeItem('user');
         setIsLoggedIn(false);
         setUserRole(null);
+        
+        window.dispatchEvent(new Event('storage'));
         window.dispatchEvent(new Event('loginStateChange'));
-        navigate('/login');
+        
+        setTimeout(() => navigate('/login'), 50);
       }
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <nav className="navbar navbar-expand-lg navbar-dark custom-navbar py-3">
