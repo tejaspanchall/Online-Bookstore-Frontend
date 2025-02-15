@@ -1,3 +1,4 @@
+// File: src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { PersonFill, JournalBookmark, PlusCircle } from 'react-bootstrap-icons';
@@ -61,16 +62,24 @@ export default function Navbar() {
     };
 
     window.addEventListener('loginStateChange', handleAuthChange);
-    return () => window.removeEventListener('loginStateChange', handleAuthChange);
+    window.addEventListener('storage', handleAuthChange);
+    
+    return () => {
+      window.removeEventListener('loginStateChange', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
   }, []);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/logout.php', {
-        method: 'POST',
-        credentials: 'include', 
-      });
-  
+      const response = await fetch(
+        'https://online-bookstore-backend-production.up.railway.app/auth/logout.php',
+        {
+          method: 'POST',
+          credentials: 'include',
+        }
+      );
+
       if (response.ok) {
         localStorage.removeItem('user');
         setIsLoggedIn(false);

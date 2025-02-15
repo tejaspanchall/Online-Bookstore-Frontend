@@ -1,3 +1,4 @@
+// File: src/components/AddBook.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../auth/AuthForm';
@@ -12,27 +13,49 @@ export default function AddBook() {
     author: '',
   });
   const [message, setMessage] = useState('');
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkSession = async () => {
+    const validateAccess = async () => {
       try {
-        const res = await fetch(
-          'https://online-bookstore-backend-production.up.railway.app/books/add.php',
+        const sessionResponse = await fetch(
+          'https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php',
           {
             method: 'GET',
             credentials: 'include',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
           }
         );
-        if (!res.ok) {
+
+        if (!sessionResponse.ok) {
+          navigate('/login');
+          return;
+        }
+
+        const data = await sessionResponse.json();
+        
+        if (data.status === 'valid' && data.user) {
+          if (data.user.role === 'teacher') {
+            setIsAuthorized(true);
+          } else {
+            navigate('/');  // Redirect non-teachers to home
+          }
+        } else {
           navigate('/login');
         }
       } catch (error) {
-        console.error('Error checking session:', error);
+        console.error('Session validation error:', error);
         navigate('/login');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    checkSession();
+    validateAccess();
   }, [navigate]);
 
   const handleFileChange = (e) => {
@@ -83,6 +106,14 @@ export default function AddBook() {
       setMessage(error.message || 'Failed to connect to server');
     }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthorized) {
+    return null; // Will be redirected by useEffect
+  }
 
   return (
     <AuthForm
