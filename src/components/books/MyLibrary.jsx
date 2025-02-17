@@ -4,6 +4,7 @@ import BookCard from "./BookCard";
 import Pagination from "./Pagination";
 
 export default function MyLibrary() {
+  const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
   const [allBooks, setAllBooks] = useState([]);
   const [displayedBooks, setDisplayedBooks] = useState([]);
@@ -31,7 +32,7 @@ export default function MyLibrary() {
     const fetchMyLibrary = async () => {
       try {
         const res = await fetch(
-          "https://online-bookstore-backend-production.up.railway.app/books/get-library.php",
+          `${BACKEND}/api/books/get-library.php`,
           {
             method: "GET",
             credentials: "include",

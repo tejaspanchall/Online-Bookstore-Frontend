@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthForm from './AuthForm';
 
 export default function Login() {
+  const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -10,7 +11,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const loginRes = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/login.php', {
+      const res = await fetch(`${BACKEND}/api/auth/login.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -20,37 +21,17 @@ export default function Login() {
         })
       });
 
-      const loginData = await loginRes.json();
+      const data = await res.json();
       
-      if (!loginRes.ok) {
-        setError(loginData.error || 'Login failed');
+      if (!res.ok) {
+        setError(data.error || 'Login failed');
         return;
       }
 
-      // After successful login, get user role
-      const roleRes = await fetch(
-        'https://online-bookstore-backend-production.up.railway.app/auth/get-role.php',
-        {
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (roleRes.ok) {
-        const roleData = await roleRes.json();
-        const userData = {
-          ...loginData.user,
-          role: roleData.role
-        };
-        localStorage.setItem('user', JSON.stringify(userData));
-      } else {
-        localStorage.setItem('user', JSON.stringify(loginData.user));
-      }
+      localStorage.setItem('user', JSON.stringify(data.user));
       
       window.dispatchEvent(new Event('loginStateChange'));
+      
       navigate('/catalog');
       
     } catch (error) {

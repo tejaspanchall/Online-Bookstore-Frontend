@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../auth/AuthForm';
 
 export default function AddBook() {
+  const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
   const [book, setBook] = useState({
     title: '',
@@ -12,89 +13,35 @@ export default function AddBook() {
     author: '',
   });
   const [message, setMessage] = useState('');
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const validateAccess = async () => {
-      try {
-        const sessionResponse = await fetch(
-          'https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php',
-          {
-            method: 'GET',
-            credentials: 'include',
-          }
-        );
-
-        if (!sessionResponse.ok) {
-          navigate('/login');
-          return;
-        }
-
-        const data = await sessionResponse.json();
-        
-        if (data.status === 'valid' && data.user) {
-          if (data.user.role === 'teacher') {
-            setIsAuthorized(true);
-          } else {
-            navigate('/');
-          }
-        } else {
-          navigate('/login');
-        }
-      } catch (error) {
-        console.error('Session validation error:', error);
-        navigate('/login');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    validateAccess();
-  }, [navigate]);
+  const [isError, setIsError] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Validate file size (5MB limit)
-      if (file.size > 5 * 1024 * 1024) {
-        setMessage('Image size must be less than 5MB');
-        return;
-      }
-      
-      // Validate file type
-      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!validTypes.includes(file.type)) {
-        setMessage('Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
-        return;
-      }
-      
-      setBook(prev => ({
-        ...prev,
-        image: file,
-      }));
-      setMessage('');
-    }
+    setBook(prev => ({
+      ...prev,
+      image: file,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
-    setIsLoading(true);
-
+    setIsError(false);
+    
     const formData = new FormData();
-    formData.append('title', book.title.trim());
-    formData.append('description', book.description.trim());
-    formData.append('isbn', book.isbn.trim());
-    formData.append('author', book.author.trim());
+
+    formData.append('title', book.title);
+    formData.append('description', book.description);
+    formData.append('isbn', book.isbn);
+    formData.append('author', book.author);
 
     if (book.image) {
       formData.append('image', book.image);
     }
 
     try {
-      const response = await fetch(
-        'https://online-bookstore-backend-production.up.railway.app/books/add.php',
+      const res = await fetch(
+        `${BACKEND}/api/books/add.php`,
         {
           method: 'POST',
           credentials: 'include',
@@ -102,39 +49,28 @@ export default function AddBook() {
         }
       );
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error(data.error || 'Failed to add book');
       }
 
       setMessage('Book added successfully!');
-      setTimeout(() => navigate('/'), 1500);
+      setIsError(false);
+      // Wait a moment before redirecting
+      setTimeout(() => navigate('/catalog'), 1500);
     } catch (error) {
       console.error('Error details:', error);
       setMessage(error.message || 'Failed to connect to server');
-    } finally {
-      setIsLoading(false);
+      setIsError(true);
     }
   };
-
-  if (isLoading) {
-    return <div className="d-flex justify-content-center p-5">
-      <div className="spinner-border" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>;
-  }
-
-  if (!isAuthorized) {
-    return null;
-  }
 
   return (
     <AuthForm
       onSubmit={handleSubmit}
       title="Add New Book"
-      footerLink={{ to: '/', text: 'Back to Home' }}
+      footerLink={{ to: '/catalog', text: 'Back to Catalog' }}
     >
       <div className="mb-3">
         <input
@@ -151,9 +87,8 @@ export default function AddBook() {
           type="file"
           className="form-control bg-dark text-white"
           onChange={handleFileChange}
-          accept="image/jpeg,image/png,image/gif,image/webp"
+          accept="image/*"
         />
-        <small className="text-muted">Max file size: 5MB. Supported formats: JPG, PNG, GIF, WebP</small>
       </div>
       <div className="mb-3">
         <textarea
@@ -185,15 +120,11 @@ export default function AddBook() {
           required
         />
       </div>
-      <button 
-        type="submit" 
-        className="btn btn-primary w-100 py-2"
-        disabled={isLoading}
-      >
-        {isLoading ? 'Adding Book...' : 'Add Book'}
+      <button type="submit" className="btn btn-primary w-100 py-2">
+        Add Book
       </button>
       {message && (
-        <div className={`mt-3 alert ${message.includes('success') ? 'alert-success' : 'alert-danger'}`}>
+        <div className={`mt-3 alert ${isError ? 'alert-danger' : 'alert-success'}`}>
           {message}
         </div>
       )}

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import AuthForm from './AuthForm';
 
 export default function ResetPassword() {
+  const BACKEND = process.env.REACT_APP_BACKEND;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const res = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/reset-password.php', {
+      const res = await fetch(`${BACKEND}/api/auth/reset-password.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

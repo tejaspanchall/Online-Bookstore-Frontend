@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 export default function BookDetail() {
+  const BACKEND = process.env.REACT_APP_BACKEND;
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
@@ -16,7 +17,7 @@ export default function BookDetail() {
   const fetchBook = async () => {
     try {
       const res = await fetch(
-        `https://online-bookstore-backend-production.up.railway.app/books/get-books.php?id=${id}`,
+        `${BACKEND}/api/books/get-books.php?id=${id}`,
         {
           credentials: "include",
         }
@@ -41,7 +42,7 @@ export default function BookDetail() {
   const fetchLibraryStatus = async () => {
     try {
       const res = await fetch(
-        "https://online-bookstore-backend-production.up.railway.app/books/get-library.php",
+        `${BACKEND}/api/books/get-library.php`,
         {
           method: "GET",
           credentials: "include",
@@ -65,7 +66,7 @@ export default function BookDetail() {
 
   const fetchUserRole = async () => {
     try {
-      const res = await fetch('https://online-bookstore-backend-production.up.railway.app/auth/get-role.php', {
+      const res = await fetch(`${BACKEND}/api/auth/get-role.php`, {
         credentials: 'include'
       });
       if (res.ok) {
@@ -118,38 +119,39 @@ export default function BookDetail() {
 
   const handleSaveEdit = async () => {
     const formData = new FormData();
-
+  
     formData.append("id", editedBook.id);
     formData.append("title", editedBook.title);
     formData.append("author", editedBook.author);
     formData.append("isbn", editedBook.isbn);
     formData.append("description", editedBook.description);
-
+  
     if (newImage) {
       formData.append("image", newImage);
     }
-
+  
     try {
       const res = await fetch(
-        "https://online-bookstore-backend-production.up.railway.app/books/update-book.php",
+        `${BACKEND}/api/books/update-book.php`,
         {
           method: "POST",
           credentials: "include",
           body: formData,
         }
       );
-
+  
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to update book");
       }
-
+  
       const updatedData = await res.json();
       setBook({
         ...editedBook,
         image: updatedData.image_path || editedBook.image,
       });
       setIsEditing(false);
+      setError(null);
     } catch (error) {
       console.error("Update error:", error);
       setError(error.message);
@@ -159,7 +161,7 @@ export default function BookDetail() {
   const handleAddToLibrary = async () => {
     try {
       const res = await fetch(
-        "https://online-bookstore-backend-production.up.railway.app/books/my-library.php",
+        `${BACKEND}/api/books/my-library.php`,
         {
           method: "POST",
           credentials: "include",
@@ -189,7 +191,7 @@ export default function BookDetail() {
   const handleRemoveFromLibrary = async () => {
     try {
       const res = await fetch(
-        "https://online-bookstore-backend-production.up.railway.app/books/remove-from-library.php",
+        `${BACKEND}/api/books/remove-from-library.php`,
         {
           method: "POST",
           credentials: "include",
@@ -215,7 +217,7 @@ export default function BookDetail() {
     if (window.confirm("Are you sure you want to delete this book?")) {
       try {
         const res = await fetch(
-          "https://online-bookstore-backend-production.up.railway.app/books/delete-book.php",
+          `${BACKEND}/api/books/delete-book.php`,
           {
             method: "POST",
             credentials: "include",

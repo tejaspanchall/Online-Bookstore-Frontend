@@ -5,6 +5,7 @@ import BookCard from "./BookCard";
 import Pagination from "./Pagination";
 
 export default function BookCatalog() {
+  const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
   const [allBooks, setAllBooks] = useState([]);
   const [displayedBooks, setDisplayedBooks] = useState([]);
@@ -41,7 +42,7 @@ export default function BookCatalog() {
   const searchBooks = async () => {
     try {
       const res = await fetch(
-        `https://online-bookstore-backend-production.up.railway.app/books/search.php?q=${search}`
+        `${BACKEND}/api/books/search.php?q=${search}`
       );
       if (!res.ok) throw new Error("Search failed");
       const data = await res.json();

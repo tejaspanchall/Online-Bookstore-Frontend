@@ -1,85 +1,60 @@
-// File: src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { PersonFill, JournalBookmark, PlusCircle } from 'react-bootstrap-icons';
 
 export default function Navbar() {
+  const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('user'));
   const [userRole, setUserRole] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const validateSession = async () => {
-    try {
-      const sessionResponse = await fetch(
-        'https://online-bookstore-backend-production.up.railway.app/auth/validate-session.php',
-        {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!sessionResponse.ok) {
-        localStorage.removeItem('user');
-        setIsLoggedIn(false);
-        setUserRole(null);
-        setIsLoading(false);
-        return;
-      }
-
-      const data = await sessionResponse.json();
-      
-      if (data.status === 'valid' && data.user) {
-        setIsLoggedIn(true);
-        setUserRole(data.user.role);
-        localStorage.setItem('user', JSON.stringify(data.user));
-      } else {
-        localStorage.removeItem('user');
-        setIsLoggedIn(false);
-        setUserRole(null);
-      }
-    } catch (error) {
-      console.error('Session validation error:', error);
-      localStorage.removeItem('user');
-      setIsLoggedIn(false);
-      setUserRole(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
-    validateSession();
-  }, []);
+    console.log('Auth state changed. Is logged in:', isLoggedIn);
+  }, [isLoggedIn]);
 
   useEffect(() => {
-    const handleAuthChange = () => {
-      validateSession();
+    const checkAuth = () => {
+      setIsLoggedIn(!!localStorage.getItem('user'));
     };
 
-    window.addEventListener('loginStateChange', handleAuthChange);
-    window.addEventListener('storage', handleAuthChange);
-    
+    checkAuth();
+
+    window.addEventListener('storage', checkAuth);
+    window.addEventListener('loginStateChange', checkAuth);
+
     return () => {
-      window.removeEventListener('loginStateChange', handleAuthChange);
-      window.removeEventListener('storage', handleAuthChange);
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('loginStateChange', checkAuth);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (isLoggedIn) {
+        try {
+          const response = await fetch(`${BACKEND}/api/auth/get-role.php`, {
+            credentials: 'include'
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setUserRole(data.role);
+          }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, [isLoggedIn]);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(
-        'https://online-bookstore-backend-production.up.railway.app/auth/logout.php',
-        {
-          method: 'POST',
-          credentials: 'include',
-        }
-      );
-
+      const response = await fetch(`${BACKEND}/api/auth/logout.php`, {
+        method: 'POST',
+        credentials: 'include', 
+      });
+  
       if (response.ok) {
         localStorage.removeItem('user');
         setIsLoggedIn(false);
@@ -95,23 +70,10 @@ export default function Navbar() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <nav className="navbar navbar-expand-lg navbar-dark custom-navbar py-3">
-        <div className="container">
-          <Link to="/" className="navbar-brand fw-bold fs-4">
-            <JournalBookmark className="me-2" />
-            BookCafe
-          </Link>
-        </div>
-      </nav>
-    );
-  }
-
   return (
     <nav className="navbar navbar-expand-lg navbar-dark custom-navbar py-3">
       <div className="container">
-        <Link to="/" className="navbar-brand fw-bold fs-4">
+        <Link to="/catalog" className="navbar-brand fw-bold fs-4">
           <JournalBookmark className="me-2" />
           BookCafe
         </Link>
@@ -130,19 +92,13 @@ export default function Navbar() {
             {isLoggedIn ? (
               <>
                 <li className="nav-item">
-                  <NavLink 
-                    to="/my-library" 
-                    className="nav-link d-flex align-items-center gap-1"
-                  >
+                  <NavLink to="/my-library" className="nav-link d-flex align-items-center gap-1">
                     <PersonFill /> My Library
                   </NavLink>
                 </li>
                 {userRole === 'teacher' && (
                   <li className="nav-item">
-                    <NavLink 
-                      to="/add-book" 
-                      className="btn btn-primary d-flex align-items-center gap-1"
-                    >
+                    <NavLink to="/add-book" className="btn btn-primary d-flex align-items-center gap-1">
                       <PlusCircle /> Add Book
                     </NavLink>
                   </li>
