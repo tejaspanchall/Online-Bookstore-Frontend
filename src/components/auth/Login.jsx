@@ -32,7 +32,13 @@ export default function Login() {
       
       window.dispatchEvent(new Event('loginStateChange'));
       
-      navigate('/catalog');
+      if (data.user.role === 'teacher') {
+        navigate('/catalog');
+      } else if (data.user.role === 'student') {
+        navigate('/catalog');
+      } else {
+        navigate('/my-library');
+      }
       
     } catch (error) {
       setError('Failed to connect to server');

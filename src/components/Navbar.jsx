@@ -5,16 +5,22 @@ import { PersonFill, JournalBookmark, PlusCircle } from 'react-bootstrap-icons';
 export default function Navbar() {
   const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('user'));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
-
-  useEffect(() => {
-    console.log('Auth state changed. Is logged in:', isLoggedIn);
-  }, [isLoggedIn]);
+  const [userName, setUserName] = useState(null);
 
   useEffect(() => {
     const checkAuth = () => {
-      setIsLoggedIn(!!localStorage.getItem('user'));
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        setIsLoggedIn(true);
+        setUserRole(user.role);
+        setUserName(user);
+      } else {
+        setIsLoggedIn(false);
+        setUserRole(null);
+      }
     };
 
     checkAuth();
@@ -27,26 +33,6 @@ export default function Navbar() {
       window.removeEventListener('loginStateChange', checkAuth);
     };
   }, []);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      if (isLoggedIn) {
-        try {
-          const response = await fetch(`${BACKEND}/auth/get-role.php`, {
-            credentials: 'include'
-          });
-          if (response.ok) {
-            const data = await response.json();
-            setUserRole(data.role);
-          }
-        } catch (error) {
-          console.error('Error fetching user role:', error);
-        }
-      }
-    };
-
-    fetchUserRole();
-  }, [isLoggedIn]);
 
   const handleLogout = async () => {
     try {
@@ -91,11 +77,13 @@ export default function Navbar() {
           <ul className="navbar-nav ms-auto align-items-center gap-3">
             {isLoggedIn ? (
               <>
-                <li className="nav-item">
+                {userName && (
+                  <li className="nav-item">
                   <NavLink to="/my-library" className="nav-link d-flex align-items-center gap-1">
-                    <PersonFill /> My Library
+                    <PersonFill /> {userName.firstname}'s Library
                   </NavLink>
                 </li>
+                )}
                 {userRole === 'teacher' && (
                   <li className="nav-item">
                     <NavLink to="/add-book" className="btn btn-primary d-flex align-items-center gap-1">

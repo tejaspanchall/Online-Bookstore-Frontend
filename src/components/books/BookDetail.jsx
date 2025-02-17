@@ -9,7 +9,6 @@ export default function BookDetail() {
   const [editedBook, setEditedBook] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [newImage, setNewImage] = useState(null);
   const [error, setError] = useState(null);
   const [inLibrary, setInLibrary] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -64,34 +63,16 @@ export default function BookDetail() {
     }
   };
 
-  const fetchUserRole = async () => {
-    try {
-      const res = await fetch(`${BACKEND}/auth/get-role.php`, {
-        credentials: 'include'
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUserRole(data.role);
-      }
-    } catch (error) {
-      console.error('Error fetching user role:', error);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setUserRole(user.role);
     }
-  };
-
-  const getImageUrl = (imagePath) => {
-    if (!imagePath)
-      return "https://via.placeholder.com/200x300?text=Book+Cover";
-    if (imagePath.startsWith("http")) return imagePath;
-    return `http://localhost${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
-  };
+  }, []);
 
   useEffect(() => {
     fetchBook();
   }, [id]);
-
-  useEffect(() => {
-    fetchUserRole();
-  }, []);
 
   useEffect(() => {
     if (book) {
@@ -101,7 +82,9 @@ export default function BookDetail() {
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
-    setNewImage(null);
+    if (!isEditing) {
+      setEditedBook({ ...book });
+    }
   };
 
   const handleInputChange = (e) => {
@@ -112,48 +95,44 @@ export default function BookDetail() {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setNewImage(file);
-  };
-
   const handleSaveEdit = async () => {
-    const formData = new FormData();
-  
-    formData.append("id", editedBook.id);
-    formData.append("title", editedBook.title);
-    formData.append("author", editedBook.author);
-    formData.append("isbn", editedBook.isbn);
-    formData.append("description", editedBook.description);
-  
-    if (newImage) {
-      formData.append("image", newImage);
-    }
-  
     try {
+      const requiredFields = ['title', 'author', 'isbn', 'description', 'image'];
+      const missingFields = requiredFields.filter(field => !editedBook[field]?.trim());
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      }
+  
       const res = await fetch(
         `${BACKEND}/books/update-book.php`,
         {
           method: "POST",
           credentials: "include",
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: editedBook.id,
+            title: editedBook.title.trim(),
+            image: editedBook.image.trim(),
+            description: editedBook.description.trim(),
+            isbn: editedBook.isbn.trim(),
+            author: editedBook.author.trim(),
+          }),
         }
       );
   
+      const data = await res.json();
+      
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to update book");
+        throw new Error(data.error || "Failed to update book");
       }
   
-      const updatedData = await res.json();
-      setBook({
-        ...editedBook,
-        image: updatedData.image_path || editedBook.image,
-      });
+      setBook(editedBook);
       setIsEditing(false);
       setError(null);
     } catch (error) {
-      console.error("Update error:", error);
       setError(error.message);
     }
   };
@@ -239,8 +218,7 @@ export default function BookDetail() {
     }
   };
 
-  if (isLoading)
-    return <div className="container py-5">Loading...</div>;
+  if (isLoading) return <div className="container py-5">Loading...</div>;
   if (error)
     return (
       <div className="container py-5">
@@ -255,47 +233,20 @@ export default function BookDetail() {
     <div className="container py-5">
       <div className="row">
         <div className="col-md-4">
-          {isEditing ? (
-            <div>
-              <input
-                type="file"
-                className="form-control mb-2"
-                onChange={handleImageChange}
-                accept="image/*"
-              />
-              <img
-                src={
-                  newImage
-                    ? URL.createObjectURL(newImage)
-                    : getImageUrl(book.image)
-                }
-                alt={book.title}
-                className="img-fluid rounded-3 shadow-sm"
-                loading="lazy"
-                style={{
-                  maxHeight: "300px",
-                  width: "100%",
-                  objectFit: "cover",
-                }}
-              />
-            </div>
-          ) : (
-            <img
-              src={getImageUrl(book.image)}
-              alt={book.title}
-              className="img-fluid rounded-3 shadow-sm"
-              loading="lazy"
-              style={{
-                maxHeight: "100%",
-                width: "300px",
-                objectFit: "cover",
-              }}
-            />
-          )}
+          <img
+            src={book.image || "https://via.placeholder.com/200x300?text=Book+Cover"}
+            alt={book.title}
+            className="img-fluid rounded-3 shadow-sm"
+            style={{
+              maxHeight: "100%",
+              width: "300px",
+              objectFit: "cover",
+            }}
+          />
         </div>
         <div className="col-md-8">
           {isEditing ? (
-            <>
+            <div className="edit-form">
               <input
                 type="text"
                 name="title"
@@ -320,15 +271,31 @@ export default function BookDetail() {
                 onChange={handleInputChange}
                 placeholder="ISBN"
               />
+              <input
+                type="url"
+                name="image"
+                className="form-control mb-2"
+                value={editedBook.image}
+                onChange={handleInputChange}
+                placeholder="Image URL"
+              />
               <textarea
                 name="description"
-                className="form-control mb-2"
+                className="form-control mb-3"
                 value={editedBook.description}
                 onChange={handleInputChange}
                 placeholder="Book Description"
                 rows="4"
               />
-            </>
+              <div className="d-flex gap-2">
+                <button className="btn btn-success" onClick={handleSaveEdit}>
+                  Save Changes
+                </button>
+                <button className="btn btn-secondary" onClick={handleEditToggle}>
+                  Cancel
+                </button>
+              </div>
+            </div>
           ) : (
             <>
               <h3 className="fw-bold mb-3">{book.title}</h3>
@@ -336,42 +303,20 @@ export default function BookDetail() {
                 <span className="badge bg-primary">{book.author}</span>
                 <span className="badge bg-secondary">ISBN: {book.isbn}</span>
               </div>
-              <p
-                className="mb-4"
-                style={{ maxHeight: "150px", overflowY: "auto" }}
-              >
+              <p className="mb-4" style={{ maxHeight: "150px", overflowY: "auto" }}>
                 {book.description}
               </p>
-            </>
-          )}
-
-          <div className="d-flex gap-2">
-            {isEditing ? (
-              <>
-                <button className="btn btn-success" onClick={handleSaveEdit}>
-                  Save Changes
-                </button>
-                <button className="btn btn-secondary" onClick={handleEditToggle}>
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
+              <div className="d-flex gap-2">
                 {inLibrary ? (
-                  <button
-                    className="btn btn-warning"
-                    onClick={handleRemoveFromLibrary}
-                  >
+                  <button className="btn btn-warning" onClick={handleRemoveFromLibrary}>
                     Remove from Library
                   </button>
                 ) : (
-                  <button
-                    className="btn btn-success"
-                    onClick={handleAddToLibrary}
-                  >
+                  <button className="btn btn-success" onClick={handleAddToLibrary}>
                     Add to Library
                   </button>
                 )}
+                
                 {userRole === 'teacher' && (
                   <>
                     <button className="btn btn-primary" onClick={handleEditToggle}>
@@ -382,15 +327,13 @@ export default function BookDetail() {
                     </button>
                   </>
                 )}
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => navigate(-1)}
-                >
+                
+                <button className="btn btn-secondary" onClick={() => navigate(-1)}>
                   Back to Catalog
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
