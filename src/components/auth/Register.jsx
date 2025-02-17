@@ -23,7 +23,7 @@ export default function Register() {
     }
   
     try {
-      const res = await fetch(`${BACKEND}/api/auth/register.php`, {
+      const res = await fetch(`${BACKEND}/auth/register.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

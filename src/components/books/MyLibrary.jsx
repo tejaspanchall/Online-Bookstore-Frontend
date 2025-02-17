@@ -32,7 +32,7 @@ export default function MyLibrary() {
     const fetchMyLibrary = async () => {
       try {
         const res = await fetch(
-          `${BACKEND}/api/books/get-library.php`,
+          `${BACKEND}/books/get-library.php`,
           {
             method: "GET",
             credentials: "include",

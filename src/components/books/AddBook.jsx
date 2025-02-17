@@ -41,7 +41,7 @@ export default function AddBook() {
 
     try {
       const res = await fetch(
-        `${BACKEND}/api/books/add.php`,
+        `${BACKEND}/books/add.php`,
         {
           method: 'POST',
           credentials: 'include',

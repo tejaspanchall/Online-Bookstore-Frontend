@@ -33,7 +33,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const res = await fetch(`${BACKEND}/api/auth/reset-password.php`, {
+      const res = await fetch(`${BACKEND}/auth/reset-password.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

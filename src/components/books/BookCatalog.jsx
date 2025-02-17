@@ -42,7 +42,7 @@ export default function BookCatalog() {
   const searchBooks = async () => {
     try {
       const res = await fetch(
-        `${BACKEND}/api/books/search.php?q=${search}`
+        `${BACKEND}/books/search.php?q=${search}`
       );
       if (!res.ok) throw new Error("Search failed");
       const data = await res.json();

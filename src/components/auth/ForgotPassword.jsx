@@ -9,7 +9,7 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${BACKEND}/api/auth/forgot-password.php`, {
+      const res = await fetch(`${BACKEND}/auth/forgot-password.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

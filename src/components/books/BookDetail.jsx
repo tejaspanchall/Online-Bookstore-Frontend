@@ -17,7 +17,7 @@ export default function BookDetail() {
   const fetchBook = async () => {
     try {
       const res = await fetch(
-        `${BACKEND}/api/books/get-books.php?id=${id}`,
+        `${BACKEND}/books/get-books.php?id=${id}`,
         {
           credentials: "include",
         }
@@ -42,7 +42,7 @@ export default function BookDetail() {
   const fetchLibraryStatus = async () => {
     try {
       const res = await fetch(
-        `${BACKEND}/api/books/get-library.php`,
+        `${BACKEND}/books/get-library.php`,
         {
           method: "GET",
           credentials: "include",
@@ -66,7 +66,7 @@ export default function BookDetail() {
 
   const fetchUserRole = async () => {
     try {
-      const res = await fetch(`${BACKEND}/api/auth/get-role.php`, {
+      const res = await fetch(`${BACKEND}/auth/get-role.php`, {
         credentials: 'include'
       });
       if (res.ok) {
@@ -132,7 +132,7 @@ export default function BookDetail() {
   
     try {
       const res = await fetch(
-        `${BACKEND}/api/books/update-book.php`,
+        `${BACKEND}/books/update-book.php`,
         {
           method: "POST",
           credentials: "include",
@@ -161,7 +161,7 @@ export default function BookDetail() {
   const handleAddToLibrary = async () => {
     try {
       const res = await fetch(
-        `${BACKEND}/api/books/my-library.php`,
+        `${BACKEND}/books/my-library.php`,
         {
           method: "POST",
           credentials: "include",
@@ -191,7 +191,7 @@ export default function BookDetail() {
   const handleRemoveFromLibrary = async () => {
     try {
       const res = await fetch(
-        `${BACKEND}/api/books/remove-from-library.php`,
+        `${BACKEND}/books/remove-from-library.php`,
         {
           method: "POST",
           credentials: "include",
@@ -217,7 +217,7 @@ export default function BookDetail() {
     if (window.confirm("Are you sure you want to delete this book?")) {
       try {
         const res = await fetch(
-          `${BACKEND}/api/books/delete-book.php`,
+          `${BACKEND}/books/delete-book.php`,
           {
             method: "POST",
             credentials: "include",

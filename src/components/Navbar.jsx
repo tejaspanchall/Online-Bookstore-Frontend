@@ -32,7 +32,7 @@ export default function Navbar() {
     const fetchUserRole = async () => {
       if (isLoggedIn) {
         try {
-          const response = await fetch(`${BACKEND}/api/auth/get-role.php`, {
+          const response = await fetch(`${BACKEND}/auth/get-role.php`, {
             credentials: 'include'
           });
           if (response.ok) {
@@ -50,7 +50,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${BACKEND}/api/auth/logout.php`, {
+      const response = await fetch(`${BACKEND}/auth/logout.php`, {
         method: 'POST',
         credentials: 'include', 
       });
