@@ -10,15 +10,18 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!form.email || !form.password) {
+      setError('All fields are required');
+      return;
+    }
+
     try {
       const res = await fetch(`${BACKEND}/auth/login.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password
-        })
+        body: JSON.stringify(form)
       });
 
       const data = await res.json();
@@ -28,17 +31,12 @@ export default function Login() {
         return;
       }
 
+      localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
       window.dispatchEvent(new Event('loginStateChange'));
       
-      if (data.user.role === 'teacher') {
-        navigate('/catalog');
-      } else if (data.user.role === 'student') {
-        navigate('/catalog');
-      } else {
-        navigate('/my-library');
-      }
+      navigate('/catalog');
       
     } catch (error) {
       setError('Failed to connect to server');

@@ -5,6 +5,7 @@ export default function ForgotPassword() {
   const BACKEND = process.env.REACT_APP_BACKEND;
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,11 +19,14 @@ export default function ForgotPassword() {
       const data = await res.json();
       if (res.ok) {
         setMessage('Reset instructions sent to your email');
+        setError('');
       } else {
-        setMessage(data.error || 'Failed to send reset instructions');
+        setError(data.error || 'Failed to send reset instructions');
+        setMessage('');
       }
     } catch (error) {
-      setMessage('Failed to send reset instructions');
+      setError('Failed to send reset instructions');
+      setMessage('');
     }
   };
 
@@ -50,11 +54,8 @@ export default function ForgotPassword() {
         Reset Password
       </button>
 
-      {message && (
-        <div className={`mt-3 alert ${message.includes('sent') ? 'alert-success' : 'alert-danger'}`}>
-          {message}
-        </div>
-      )}
+      {error && <div className="mt-3 alert alert-danger">{error}</div>}
+      {message && <div className="mt-3 alert alert-success">{message}</div>}
     </AuthForm>
   );
 }

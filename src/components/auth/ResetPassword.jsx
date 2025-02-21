@@ -10,6 +10,7 @@ export default function ResetPassword() {
     password: '',
     confirmPassword: '',
   });
+  const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const token = searchParams.get('token');
 
@@ -23,12 +24,12 @@ export default function ResetPassword() {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      setMessage('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
     if (formData.password.length < 6) {
-      setMessage('Password must be at least 6 characters long');
+      setError('Password must be at least 6 characters long');
       return;
     }
 
@@ -45,12 +46,15 @@ export default function ResetPassword() {
       const data = await res.json();
       if (res.ok) {
         setMessage('Password reset successful');
+        setError('');
         setTimeout(() => navigate('/login'), 2000);
       } else {
-        setMessage(data.error || 'Failed to reset password');
+        setError(data.error || 'Failed to reset password');
+        setMessage('');
       }
     } catch (error) {
-      setMessage('Failed to reset password');
+      setError('Failed to reset password');
+      setMessage('');
     }
   };
 
@@ -86,11 +90,8 @@ export default function ResetPassword() {
         Reset Password
       </button>
 
-      {message && (
-        <div className={`mt-3 alert ${message.includes('successful') ? 'alert-success' : 'alert-danger'}`}>
-          {message}
-        </div>
-      )}
+      {error && <div className="mt-3 alert alert-danger">{error}</div>}
+      {message && <div className="mt-3 alert alert-success">{message}</div>}
     </AuthForm>
   );
 }

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { PersonFill, JournalBookmark, PlusCircle } from 'react-bootstrap-icons';
+import { AuthContext } from './context/AuthContext';
 
 export default function Navbar() {
   const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userName, setUserName] = useState(null);
@@ -35,25 +37,12 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      const response = await fetch(`${BACKEND}/auth/logout.php`, {
-        method: 'POST',
-        credentials: 'include', 
-      });
-  
-      if (response.ok) {
-        localStorage.removeItem('user');
-        setIsLoggedIn(false);
-        setUserRole(null);
-        
-        window.dispatchEvent(new Event('storage'));
-        window.dispatchEvent(new Event('loginStateChange'));
-        
-        setTimeout(() => navigate('/login'), 50);
-      }
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    logout();
+    
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('loginStateChange'));
+    
+    setTimeout(() => navigate('/login'), 50);
   };
 
   return (

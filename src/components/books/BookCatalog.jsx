@@ -40,27 +40,48 @@ export default function BookCatalog() {
   };
 
   const searchBooks = async () => {
+    setIsLoading(true);
     try {
-      const res = await fetch(
-        `${BACKEND}/books/search.php?q=${search}`
-      );
-      if (!res.ok) throw new Error("Search failed");
+      let url = `${BACKEND}/books/search.php`;
+      if (search) {
+        url += `?q=${encodeURIComponent(search)}`;
+      }
+      
+      console.log("Fetching from URL:", url);
+      
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("API Error Response:", errorText);
+        throw new Error(`Server responded with ${res.status}: ${errorText}`);
+      }
+      
       const data = await res.json();
-
-      const books = Array.isArray(data) ? data : data.books || [];
+      console.log("API Response:", data);
+      
+      const books = Array.isArray(data) ? data : [];
       const filteredBooks = applyFilter(books);
       setAllBooks(filteredBooks);
 
       const total = Math.ceil(filteredBooks.length / BOOKS_PER_PAGE);
-      setTotalPages(total);
+      setTotalPages(total || 1);
 
       updateDisplayedBooks(filteredBooks, 1);
+      setMessage("");
     } catch (error) {
-      console.error("Fetch error:", error);
-      setMessage("Search failed");
+      console.error("Fetch error details:", error);
+      setMessage(`Search failed: ${error.message}`);
       setAllBooks([]);
       setDisplayedBooks([]);
       setTotalPages(1);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,13 +93,20 @@ export default function BookCatalog() {
   };
 
   useEffect(() => {
-    searchBooks();
+    const timer = setTimeout(() => {
+      searchBooks().catch(err => {
+        console.error("Initial load error:", err);
+        setMessage("Could not load books. Please check your API configuration.");
+      });
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
     const filteredBooks = applyFilter(allBooks);
-    setDisplayedBooks(filteredBooks.slice(0, BOOKS_PER_PAGE));
-    setTotalPages(Math.ceil(filteredBooks.length / BOOKS_PER_PAGE));
+    updateDisplayedBooks(filteredBooks, 1);
+    setTotalPages(Math.ceil(filteredBooks.length / BOOKS_PER_PAGE) || 1);
   }, [filter]);
 
   const handleBookClick = (bookId) => {
@@ -101,8 +129,12 @@ export default function BookCatalog() {
               onChange={(e) => setSearch(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && searchBooks()}
             />
-            <button onClick={searchBooks} className="btn btn-primary px-4">
-              Search
+            <button 
+              onClick={searchBooks} 
+              className="btn btn-primary px-4"
+              disabled={isLoading}
+            >
+              {isLoading ? "Searching..." : "Search"}
             </button>
 
             <div className="ms-3">
@@ -122,7 +154,10 @@ export default function BookCatalog() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setFilter("asc")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setFilter("asc");
+                      }}
                     >
                       A-Z
                     </a>
@@ -131,7 +166,10 @@ export default function BookCatalog() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setFilter("desc")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setFilter("desc");
+                      }}
                     >
                       Z-A
                     </a>
@@ -140,7 +178,10 @@ export default function BookCatalog() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setFilter("recent")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setFilter("recent");
+                      }}
                     >
                       Recently Added
                     </a>
@@ -149,7 +190,10 @@ export default function BookCatalog() {
                     <a
                       className="dropdown-item"
                       href="#"
-                      onClick={() => setFilter("last")}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setFilter("last");
+                      }}
                     >
                       Last Added
                     </a>
@@ -171,7 +215,13 @@ export default function BookCatalog() {
         </div>
       )}
 
-      {displayedBooks.length === 0 ? (
+      {isLoading ? (
+        <div className="text-center mt-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) : displayedBooks.length === 0 ? (
         <div className="text-center mt-4">
           <p className="text-muted">No books found</p>
         </div>

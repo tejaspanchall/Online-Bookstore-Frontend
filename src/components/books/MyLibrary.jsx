@@ -15,67 +15,74 @@ export default function MyLibrary() {
   const BOOKS_PER_PAGE = 10;
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath)
+    if (!imagePath) {
       return "https://via.placeholder.com/200x300?text=Book+Cover";
+    }
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://localhost${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
+    return `${BACKEND}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
   };
 
   const updateDisplayedBooks = (books, page) => {
     const startIndex = (page - 1) * BOOKS_PER_PAGE;
     const endIndex = startIndex + BOOKS_PER_PAGE;
-    setDisplayedBooks(books.slice(startIndex, endIndex));
+    const booksToDisplay = books.slice(startIndex, endIndex);
+    setDisplayedBooks(booksToDisplay);
     setCurrentPage(page);
+    setTotalPages(Math.ceil(books.length / BOOKS_PER_PAGE));
   };
 
   useEffect(() => {
     const fetchMyLibrary = async () => {
       try {
-        const res = await fetch(
-          `${BACKEND}/books/get-library.php`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+        
+        const response = await fetch(`${BACKEND}/books/get-library.php`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json"
           }
-        );
+        });
 
-        if (!res.ok) {
-          if (res.status === 401) {
-            navigate("/login");
-            return;
-          }
-          throw new Error("Failed to fetch library");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch library');
         }
 
-        const data = await res.json();
-        const books = Array.isArray(data) ? data : [];
+        if (data.status === 'error') {
+          throw new Error(data.message);
+        }
+
+        const books = data.data || [];
         setAllBooks(books);
-
-        const total = Math.ceil(books.length / BOOKS_PER_PAGE);
-        setTotalPages(total);
-
         updateDisplayedBooks(books, 1);
       } catch (error) {
         console.error("Fetch error:", error);
-        setError("Failed to fetch library");
+        if (error.message.includes('token')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate("/login");
+          return;
+        }
+        setError(error.message || "Failed to fetch library. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchMyLibrary();
-  }, [navigate]);
+  }, [BACKEND, navigate]);
 
   if (loading) {
     return (
       <div className="container py-5">
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ minHeight: "200px" }}
-        >
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "200px" }}>
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
@@ -88,7 +95,15 @@ export default function MyLibrary() {
     return (
       <div className="container py-5">
         <div className="alert alert-danger" role="alert">
-          {error}
+          <div className="d-flex flex-column align-items-center">
+            <p className="mb-3">{error}</p>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -107,10 +122,7 @@ export default function MyLibrary() {
         <div className="text-center py-5">
           <p className="text-muted mb-4">Your library is empty</p>
           <div className="d-flex justify-content-center">
-            <button
-              className="btn btn-lg btn-primary"
-              onClick={() => navigate("/")}
-            >
+            <button className="btn btn-lg btn-primary" onClick={() => navigate("/")}>
               Discover Books
             </button>
           </div>

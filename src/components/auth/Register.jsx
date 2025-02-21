@@ -13,13 +13,22 @@ export default function Register() {
     password: '',
     role: 'student'
   });
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (form.email !== form.confirmEmail) {
-      alert('Emails do not match');
+      setError('Emails do not match');
       return;
+    }
+
+    const required = ['firstname', 'lastname', 'email', 'password', 'role'];
+    for (const field of required) {
+      if (!form[field]) {
+        setError(`Missing required field: ${field}`);
+        return;
+      }
     }
   
     try {
@@ -42,10 +51,10 @@ export default function Register() {
         alert('Registration successful! Please login');
         navigate('/login');
       } else {
-        alert(data.error || 'Registration failed');
+        setError(data.error || 'Registration failed');
       }
     } catch (error) {
-      alert('Failed to connect to server');
+      setError('Failed to connect to server');
     }
   };
 
@@ -55,6 +64,8 @@ export default function Register() {
       title="Register"
       footerLink={{ to: '/login', text: 'Already have an account? Login' }}
     >
+      {error && <div className="alert alert-danger">{error}</div>}
+
       <div className="row g-3">
         <div className="col-md-6">
           <input 

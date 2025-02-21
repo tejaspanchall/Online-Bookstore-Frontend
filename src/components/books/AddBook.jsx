@@ -1,56 +1,77 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../auth/AuthForm';
+import { AuthContext } from '../context/AuthContext';
 
 export default function AddBook() {
   const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
+  const { token, isTeacher } = useContext(AuthContext);
+  
   const [book, setBook] = useState({
     title: '',
-    imageUrl: '',
+    image: '',
     description: '',
     isbn: '',
     author: '',
   });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     setIsError(false);
+    setIsLoading(true);
     
     try {
-      const res = await fetch(
-        `${BACKEND}/books/add.php`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            title: book.title.trim(),
-            image: book.imageUrl.trim(),
-            description: book.description.trim(),
-            isbn: book.isbn.trim(),
-            author: book.author.trim(),
-          }),
-        }
-      );
+      if (!token || !isTeacher()) {
+        throw new Error('Only teachers can add books');
+      }
 
-      const data = await res.json();
+      const requiredFields = ['title', 'image', 'description', 'isbn', 'author'];
+      for (const field of requiredFields) {
+        if (!book[field] || !book[field].trim()) {
+          throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is required`);
+        }
+      }
+
+      try {
+        new URL(book.image);
+      } catch {
+        throw new Error('Please enter a valid image URL');
+      }
+      
+      const res = await fetch(`${BACKEND}/books/add.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: book.title.trim(),
+          image: book.image.trim(),
+          description: book.description.trim(),
+          isbn: book.isbn.trim(),
+          author: book.author.trim(),
+        }),
+      });
 
       if (!res.ok) {
+        const data = await res.json();
         throw new Error(data.error || 'Failed to add book');
       }
 
+      const data = await res.json();
       setMessage('Book added successfully!');
       setIsError(false);
       setTimeout(() => navigate('/catalog'), 1500);
     } catch (error) {
       setMessage(error.message || 'Failed to connect to server');
       setIsError(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -75,8 +96,8 @@ export default function AddBook() {
           type="url"
           className="form-control bg-dark text-white"
           placeholder="Image URL"
-          value={book.imageUrl}
-          onChange={(e) => setBook({ ...book, imageUrl: e.target.value })}
+          value={book.image}
+          onChange={(e) => setBook({ ...book, image: e.target.value })}
           required
         />
       </div>
@@ -110,8 +131,12 @@ export default function AddBook() {
           required
         />
       </div>
-      <button type="submit" className="btn btn-primary w-100 py-2">
-        Add Book
+      <button 
+        type="submit" 
+        className="btn btn-primary w-100 py-2"
+        disabled={isLoading}
+      >
+        {isLoading ? 'Adding Book...' : 'Add Book'}
       </button>
       {message && (
         <div className={`mt-3 alert ${isError ? 'alert-danger' : 'alert-success'}`}>
