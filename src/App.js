@@ -10,6 +10,7 @@ import AddBook from './components/books/AddBook';
 import ResetPassword from './components/auth/ResetPassword';
 import BookDetail from './components/books/BookDetail';
 import { AuthProvider } from './components/context/AuthContext';
+import EditBook from './components/books/EditBook';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="/add-book" element={<AddBook />} />
               <Route path="/my-library" element={<MyLibrary />} />
               <Route path="/book/:id" element={<BookDetail />} />
+              <Route path="/book/:id/edit" element={<EditBook />} />
             </Routes>
           </div>
           <Toaster position="bottom-right" toastOptions={{ className: 'bg-gray-800 text-white' }} />
