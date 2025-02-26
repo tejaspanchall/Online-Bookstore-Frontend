@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import AuthForm from '../auth/AuthForm';
 import { AuthContext } from '../context/AuthContext';
 
@@ -15,14 +16,10 @@ export default function AddBook() {
     isbn: '',
     author: '',
   });
-  const [message, setMessage] = useState('');
-  const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
-    setIsError(false);
     setIsLoading(true);
     
     try {
@@ -63,13 +60,23 @@ export default function AddBook() {
         throw new Error(data.error || 'Failed to add book');
       }
 
-      const data = await res.json();
-      setMessage('Book added successfully!');
-      setIsError(false);
-      setTimeout(() => navigate('/catalog'), 1500);
+      await res.json();
+      
+      Swal.fire({
+        title: 'Success!',
+        text: 'Book added successfully!',
+        icon: 'success',
+        confirmButtonColor: 'var(--color-button-primary)'
+      }).then(() => {
+        navigate('/catalog');
+      });
     } catch (error) {
-      setMessage(error.message || 'Failed to connect to server');
-      setIsError(true);
+      Swal.fire({
+        title: 'Error!',
+        text: error.message || 'Failed to connect to server',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
     } finally {
       setIsLoading(false);
     }
@@ -169,11 +176,6 @@ export default function AddBook() {
       >
         {isLoading ? 'Adding Book...' : 'Add Book'}
       </button>
-      {message && (
-        <div className={`mt-3 p-3 rounded ${isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'}`}>
-          {message}
-        </div>
-      )}
     </AuthForm>
   );
 }

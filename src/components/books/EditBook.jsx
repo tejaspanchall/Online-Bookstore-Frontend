@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function EditBook() {
   const BACKEND = process.env.REACT_APP_BACKEND;
@@ -22,7 +23,11 @@ export default function EditBook() {
 
   useEffect(() => {
     if (!isAuthenticated() || !isTeacher()) {
-      setError("You must be logged in as a teacher to edit books");
+      Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You must be logged in as a teacher to edit books'
+      });
       setIsLoading(false);
       return;
     }
@@ -67,6 +72,14 @@ export default function EditBook() {
         setError(error.message);
         
         if (error.message.includes("session has expired")) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Session Expired',
+            text: 'Your session has expired. You will be redirected to login.',
+            timer: 2000,
+            timerProgressBar: true
+          });
+          
           setTimeout(() => {
             logout();
             navigate("/login");
@@ -120,11 +133,20 @@ export default function EditBook() {
     e.preventDefault();
     
     if (!isAuthenticated() || !isTeacher()) {
-      setError("You must be a teacher to edit books");
+      Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'You must be a teacher to edit books'
+      });
       return;
     }
 
     if (!validateForm()) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Please check the form for errors'
+      });
       return;
     }
 
@@ -157,10 +179,22 @@ export default function EditBook() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || data.message || "Failed to update book");
 
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Book updated successfully!',
+        timer: 1500,
+        timerProgressBar: true
+      });
+      
       navigate(`/book/${id}`, { state: { successMessage: "Book updated successfully!" } });
     } catch (error) {
       console.error("Save error:", error);
-      setError(error.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message
+      });
       
       if (error.message.includes("session has expired")) {
         setTimeout(() => {
@@ -184,9 +218,6 @@ export default function EditBook() {
   if (error) {
     return (
       <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>
-        <div className="p-4 rounded-lg" role="alert" style={{ backgroundColor: "rgba(var(--color-accent), 0.2)", color: "var(--color-text-light)" }}>
-          Error: {error}
-        </div>
         <div className="mt-4">
           <button
             onClick={() => navigate(-1)}

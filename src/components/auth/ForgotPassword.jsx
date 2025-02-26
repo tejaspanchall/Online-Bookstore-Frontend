@@ -1,11 +1,10 @@
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 import AuthForm from './AuthForm';
 
 export default function ForgotPassword() {
   const BACKEND = process.env.REACT_APP_BACKEND;
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,15 +17,27 @@ export default function ForgotPassword() {
       
       const data = await res.json();
       if (res.ok) {
-        setMessage('Reset instructions sent to your email');
-        setError('');
+        Swal.fire({
+          title: 'Success!',
+          text: 'Reset instructions sent to your email',
+          icon: 'success',
+          confirmButtonColor: 'var(--color-button-primary)'
+        });
       } else {
-        setError(data.error || 'Failed to send reset instructions');
-        setMessage('');
+        Swal.fire({
+          title: 'Error!',
+          text: data.error || 'Failed to send reset instructions',
+          icon: 'error',
+          confirmButtonColor: 'var(--color-button-primary)'
+        });
       }
     } catch (error) {
-      setError('Failed to send reset instructions');
-      setMessage('');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to send reset instructions',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
     }
   };
 
@@ -53,9 +64,6 @@ export default function ForgotPassword() {
       >
         Reset Password
       </button>
-
-      {error && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{error}</div>}
-      {message && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{message}</div>}
     </AuthForm>
   );
 }

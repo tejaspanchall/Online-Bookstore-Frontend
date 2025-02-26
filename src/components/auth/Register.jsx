@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import AuthForm from './AuthForm';
 
 export default function Register() {
@@ -13,21 +14,30 @@ export default function Register() {
     password: '',
     role: 'student'
   });
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (form.email !== form.confirmEmail) {
-      setError('Emails do not match');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Emails do not match',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
       return;
     }
 
     const required = ['firstname', 'lastname', 'email', 'password', 'role'];
     for (const field of required) {
       if (!form[field]) {
-        setError(`Missing required field: ${field}`);
+        Swal.fire({
+          title: 'Error!',
+          text: `Missing required field: ${field}`,
+          icon: 'error',
+          confirmButtonColor: 'var(--color-button-primary)'
+        });
         return;
       }
     }
@@ -49,13 +59,29 @@ export default function Register() {
       const data = await res.json();
       
       if (res.ok) {
-        alert('Registration successful! Please login');
-        navigate('/login');
+        Swal.fire({
+          title: 'Success!',
+          text: 'Registration successful! Please login',
+          icon: 'success',
+          confirmButtonColor: 'var(--color-button-primary)'
+        }).then(() => {
+          navigate('/login');
+        });
       } else {
-        setError(data.error || 'Registration failed');
+        Swal.fire({
+          title: 'Error!',
+          text: data.error || 'Registration failed',
+          icon: 'error',
+          confirmButtonColor: 'var(--color-button-primary)'
+        });
       }
     } catch (error) {
-      setError('Failed to connect to server');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to connect to server',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
     }
   };
 
@@ -65,8 +91,6 @@ export default function Register() {
       title="Register"
       footerLink={{ to: '/login', text: 'Already have an account? Login' }}
     >
-      {error && <div className="text-[var(--color-text-secondary)] text-sm mb-4">{error}</div>}
-
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <input 

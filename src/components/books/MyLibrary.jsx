@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import BookCard from "./BookCard";
 import Pagination from "./Pagination";
 
@@ -71,6 +72,19 @@ export default function MyLibrary() {
           return;
         }
         setError(error.message || "Failed to fetch library. Please try again later.");
+        
+        // Show SweetAlert2 error notification
+        Swal.fire({
+          title: 'Error',
+          text: error.message || "Failed to fetch library. Please try again later.",
+          icon: 'error',
+          confirmButtonText: 'Try Again',
+          confirmButtonColor: 'var(--color-button-primary)'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
       } finally {
         setLoading(false);
       }
@@ -98,24 +112,23 @@ export default function MyLibrary() {
   }
 
   if (error) {
+    // We'll still render a minimal error state in the UI
+    // but the main error notification is now handled by SweetAlert2
     return (
       <div className="container py-5">
-        <div className="p-4 bg-red-100 border border-red-200 rounded" role="alert">
-          <div className="flex flex-col items-center">
-            <p className="mb-3 text-red-700">{error}</p>
-            <button 
-              className="px-4 py-2 rounded transition duration-300"
-              style={{ 
-                backgroundColor: 'var(--color-button-primary)',
-                color: 'var(--color-bg-primary)'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-hover)'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-primary)'}
-              onClick={() => window.location.reload()}
-            >
-              Try Again
-            </button>
-          </div>
+        <div className="text-center py-5">
+          <button 
+            className="px-4 py-2 rounded transition duration-300"
+            style={{ 
+              backgroundColor: 'var(--color-button-primary)',
+              color: 'var(--color-bg-primary)'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-hover)'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-primary)'}
+            onClick={() => window.location.reload()}
+          >
+            Reload Page
+          </button>
         </div>
       </div>
     );
@@ -156,7 +169,22 @@ export default function MyLibrary() {
               }}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-hover)'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-primary)'}
-              onClick={() => navigate("/")}
+              onClick={() => {
+                Swal.fire({
+                  title: 'Library Empty',
+                  text: 'Would you like to browse our collection to add books to your library?',
+                  icon: 'info',
+                  showCancelButton: true,
+                  confirmButtonText: 'Yes, browse books',
+                  cancelButtonText: 'No, thanks',
+                  confirmButtonColor: 'var(--color-button-primary)',
+                  cancelButtonColor: 'var(--color-button-secondary)'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    navigate("/");
+                  }
+                });
+              }}
             >
               Discover Books
             </button>

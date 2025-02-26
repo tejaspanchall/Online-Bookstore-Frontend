@@ -1,19 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import AuthForm from './AuthForm';
 
 export default function Login() {
   const BACKEND = process.env.REACT_APP_BACKEND;
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!form.email || !form.password) {
-      setError('All fields are required');
+      Swal.fire({
+        title: 'Error!',
+        text: 'All fields are required',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
       return;
     }
 
@@ -28,7 +33,12 @@ export default function Login() {
       const data = await res.json();
       
       if (!res.ok) {
-        setError(data.error || 'Login failed');
+        Swal.fire({
+          title: 'Error!',
+          text: data.error || 'Login failed',
+          icon: 'error',
+          confirmButtonColor: 'var(--color-button-primary)'
+        });
         return;
       }
 
@@ -40,7 +50,12 @@ export default function Login() {
       navigate('/catalog');
       
     } catch (error) {
-      setError('Failed to connect to server');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to connect to server',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
     }
   };
 
@@ -50,8 +65,6 @@ export default function Login() {
       title="Login" 
       footerLink={{ to: '/forgot-password', text: 'Forgot Password?' }}
     >
-      {error && <div className="text-[var(--color-text-secondary)] text-sm mb-4">{error}</div>}
-      
       <div className="mb-4">
         <input
           type="email"

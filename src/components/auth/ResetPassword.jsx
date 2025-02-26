@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import AuthForm from './AuthForm';
 
 export default function ResetPassword() {
@@ -10,8 +11,6 @@ export default function ResetPassword() {
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const token = searchParams.get('token');
 
@@ -25,12 +24,22 @@ export default function ResetPassword() {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Passwords do not match',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Password must be at least 6 characters long',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
       return;
     }
 
@@ -46,16 +55,29 @@ export default function ResetPassword() {
       
       const data = await res.json();
       if (res.ok) {
-        setMessage('Password reset successful');
-        setError('');
-        setTimeout(() => navigate('/login'), 2000);
+        Swal.fire({
+          title: 'Success!',
+          text: 'Password reset successful',
+          icon: 'success',
+          confirmButtonColor: 'var(--color-button-primary)'
+        }).then(() => {
+          navigate('/login');
+        });
       } else {
-        setError(data.error || 'Failed to reset password');
-        setMessage('');
+        Swal.fire({
+          title: 'Error!',
+          text: data.error || 'Failed to reset password',
+          icon: 'error',
+          confirmButtonColor: 'var(--color-button-primary)'
+        });
       }
     } catch (error) {
-      setError('Failed to reset password');
-      setMessage('');
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to reset password',
+        icon: 'error',
+        confirmButtonColor: 'var(--color-button-primary)'
+      });
     }
   };
 
@@ -108,9 +130,6 @@ export default function ResetPassword() {
       >
         Reset Password
       </button>
-
-      {error && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{error}</div>}
-      {message && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{message}</div>}
     </AuthForm>
   );
 }

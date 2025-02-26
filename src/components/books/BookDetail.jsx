@@ -1,6 +1,7 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function BookDetail() {
   const BACKEND = process.env.REACT_APP_BACKEND;
@@ -13,7 +14,6 @@ export default function BookDetail() {
   const [error, setError] = useState(null);
   const [inLibrary, setInLibrary] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
 
   const fetchBook = async () => {
     try {
@@ -101,7 +101,13 @@ export default function BookDetail() {
 
   useEffect(() => {
     if (location.state?.successMessage) {
-      setSuccessMessage(location.state.successMessage);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: location.state.successMessage,
+        timer: 3000,
+        timerProgressBar: true
+      });
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -137,14 +143,23 @@ export default function BookDetail() {
       }
 
       setInLibrary(true);
-      setSuccessMessage(responseData.message || "Book added to your library successfully!");
-      setTimeout(() => setSuccessMessage(null), 3000);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: responseData.message || "Book added to your library successfully!",
+        timer: 3000,
+        timerProgressBar: true
+      });
       setError(null);
 
       fetchLibraryStatus();
     } catch (error) {
       console.error("Add to library error:", error);
-      setError(error.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message
+      });
     }
   };
 
@@ -171,16 +186,35 @@ export default function BookDetail() {
       }
 
       setInLibrary(false);
-      setSuccessMessage("Book removed from your library");
-      setTimeout(() => setSuccessMessage(null), 3000);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: "Book removed from your library",
+        timer: 3000,
+        timerProgressBar: true
+      });
       setError(null);
     } catch (error) {
-      setError(error.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message
+      });
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this book?")) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -213,12 +247,24 @@ export default function BookDetail() {
         throw new Error(errorData.error || errorData.message || "Failed to delete book");
       }
 
-      setSuccessMessage("Book deleted successfully");
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: 'Book deleted successfully',
+        timer: 1500,
+        timerProgressBar: true
+      });
+      
       setTimeout(() => {
         navigate("/catalog");
       }, 1500);
     } catch (error) {
-      setError(error.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message
+      });
+      
       if (error.message.includes("session has expired")) {
         setTimeout(() => {
           logout();
@@ -236,6 +282,7 @@ export default function BookDetail() {
         Loading...
       </div>
     );
+    
   if (error)
     return (
       <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>
@@ -244,6 +291,7 @@ export default function BookDetail() {
         </div>
       </div>
     );
+    
   if (!book)
     return (
       <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>
@@ -253,12 +301,6 @@ export default function BookDetail() {
 
   return (
     <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>
-      {successMessage && (
-        <div className="p-4 rounded-lg mb-6" role="alert" style={{ backgroundColor: "var(--color-text-secondary)", color: "var(--color-bg-primary)", borderColor: "var(--color-primary)" }}>
-          {successMessage}
-        </div>
-      )}
-
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/3 lg:w-1/4">
           <img

@@ -51,7 +51,7 @@ export default function Navbar() {
         <Link to="/catalog" className="text-2xl font-bold text-white flex items-center">
           <JournalBookmark className="mr-2 text-white" />
           <span className="text-white">Book</span>
-          <span className="text-[var(--color-text-light)]">Cafe</span>
+          <span className="text-[var(--color-text-logo)]">Cafe</span>
         </Link>
 
         <div className="flex items-center space-x-6">
