@@ -36,10 +36,10 @@ export default function ForgotPassword() {
       title="Forgot Password"
       footerLink={{ to: '/login', text: 'Back to Login' }}
     >
-      <div className="mb-4">
+      <div className="mb-6">
         <input 
           type="email"
-          className="form-control bg-dark text-white"
+          className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
           placeholder="Enter your email"
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -49,13 +49,13 @@ export default function ForgotPassword() {
       
       <button 
         type="submit"
-        className="btn btn-primary w-100 py-2"
+        className="w-full bg-[var(--color-button-primary)] text-white py-2 rounded-lg hover:bg-[var(--color-button-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
       >
         Reset Password
       </button>
 
-      {error && <div className="mt-3 alert alert-danger">{error}</div>}
-      {message && <div className="mt-3 alert alert-success">{message}</div>}
+      {error && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{error}</div>}
+      {message && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{message}</div>}
     </AuthForm>
   );
 }

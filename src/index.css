@@ -2,27 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom base styles */
-body {
-  @apply bg-dark text-slate-100;
-}
-
-/* Smooth transitions */
-button, a, input[type="submit"] {
-  @apply transition-all duration-200 ease-in-out;
-}
-
-/* Custom form styles */
-input, textarea, select {
-  @apply bg-dark-2 border border-dark-3 rounded-lg px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
-}
-
-/* Custom button styles */
-.btn-primary {
-  @apply bg-primary hover:bg-secondary text-white font-medium rounded-lg px-6 py-3 flex items-center justify-center gap-2;
-}
-
-/* Card hover effect */
-.card-hover {
-  @apply transition-transform duration-200 hover:scale-[1.02];
-}
+:root {
+    /* Primary colors */
+    --color-primary: #000000;
+    --color-secondary: #333333;
+    --color-accent: #555555;
+    
+    /* Background colors */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f5f5f5;
+    
+    /* Text colors */
+    --color-text-primary: #000000;
+    --color-text-secondary: #333333;
+    --color-text-light: #555555;
+    
+    /* Border colors */
+    --color-border: #e0e0e0;
+    
+    /* Button colors */
+    --color-button-primary: #000000;
+    --color-button-hover: #333333;
+    
+    /* Focus ring */
+    --color-focus-ring: #000000;
+  }

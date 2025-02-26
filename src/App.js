@@ -1,6 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min';
-import './custom.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -17,7 +14,7 @@ import { AuthProvider } from './components/context/AuthContext';
 export default function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-gray-900 text-gray-100">
+      <div className="min-h-screen bg-[var--color-bg-primary] text-black-100">
         <BrowserRouter>
           <Navbar />
           <div className="container mx-auto px-4 py-8">

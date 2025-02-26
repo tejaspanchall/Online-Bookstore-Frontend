@@ -14,6 +14,7 @@ export default function Register() {
     role: 'student'
   });
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,23 +65,23 @@ export default function Register() {
       title="Register"
       footerLink={{ to: '/login', text: 'Already have an account? Login' }}
     >
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="text-[var(--color-text-secondary)] text-sm mb-4">{error}</div>}
 
-      <div className="row g-3">
-        <div className="col-md-6">
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
           <input 
             type="text"
-            className="form-control bg-dark text-white"
+            className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
             placeholder="First Name"
             value={form.firstname}
             onChange={e => setForm({...form, firstname: e.target.value})}
             required
           />
         </div>
-        <div className="col-md-6">
+        <div>
           <input 
             type="text"
-            className="form-control bg-dark text-white"
+            className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
             placeholder="Last Name"
             value={form.lastname}
             onChange={e => setForm({...form, lastname: e.target.value})}
@@ -89,9 +90,9 @@ export default function Register() {
         </div>
       </div>
 
-      <div className="mt-3">
+      <div className="mb-4">
         <select 
-          className="form-select bg-dark text-white"
+          className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
           value={form.role}
           onChange={e => setForm({...form, role: e.target.value})}
           required
@@ -101,10 +102,10 @@ export default function Register() {
         </select>
       </div>
 
-      <div className="mt-3">
+      <div className="mb-4">
         <input 
           type="email"
-          className="form-control bg-dark text-white"
+          className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
           placeholder="Email"
           value={form.email}
           onChange={e => setForm({...form, email: e.target.value})}
@@ -112,10 +113,10 @@ export default function Register() {
         />
       </div>
 
-      <div className="mt-3">
+      <div className="mb-4">
         <input 
           type="email"
-          className="form-control bg-dark text-white"
+          className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
           placeholder="Confirm Email"
           value={form.confirmEmail}
           onChange={e => setForm({...form, confirmEmail: e.target.value})}
@@ -123,20 +124,29 @@ export default function Register() {
         />
       </div>
 
-      <div className="mt-3">
-        <input 
-          type="password"
-          className="form-control bg-dark text-white"
-          placeholder="Password"
-          value={form.password}
-          onChange={e => setForm({...form, password: e.target.value})}
-          required
-        />
+      <div className="mb-6">
+        <div className="relative">
+          <input 
+            type={showPassword ? 'text' : 'password'}
+            className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+            placeholder="Password"
+            value={form.password}
+            onChange={e => setForm({...form, password: e.target.value})}
+            required
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 px-3 py-2 text-sm text-[var(--color-text-light)] hover:text-[var(--color-text-primary)]"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
       </div>
 
       <button 
         type="submit"
-        className="btn btn-primary w-100 mt-4 py-2"
+        className="w-full bg-[var(--color-button-primary)] text-white py-2 rounded-lg hover:bg-[var(--color-button-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
       >
         Register
       </button>

@@ -323,135 +323,224 @@ export default function BookDetail() {
     }
   };
 
-  if (isLoading) return <div className="container py-5">Loading...</div>;
+  if (isLoading) return <div className="container mx-auto py-12" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>Loading...</div>;
   if (error)
     return (
-      <div className="container py-5">
-        <div className="alert alert-danger" role="alert">
+      <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>
+        <div className="p-4 rounded-lg" role="alert" style={{ backgroundColor: "rgba(var(--color-accent), 0.2)", color: "var(--color-text-light)" }}>
           Error: {error}
         </div>
       </div>
     );
-  if (!book) return <div className="container py-5">Book not found</div>;
+  if (!book) return <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>Book not found</div>;
 
   return (
-    <div className="container py-5">
+    <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>
       {successMessage && (
-        <div className="alert alert-success mb-4" role="alert">
+        <div className="p-4 rounded-lg mb-6" role="alert" style={{ 
+          backgroundColor: "(var(--color-text-secondary)", 
+          color: "var(--color-text-secondary)",
+          borderColor: "var(--color-primary)" 
+        }}>
           {successMessage}
         </div>
       )}
       
-      <div className="row">
-        <div className="col-md-4">
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="md:w-1/3 lg:w-1/4">
           <img
             src={book.image || "https://via.placeholder.com/200x300?text=Book+Cover"}
             alt={book.title}
-            className="img-fluid rounded-3 shadow-sm"
+            className="w-full rounded-lg shadow-md"
             style={{
               maxHeight: "100%",
-              width: "300px",
+              maxWidth: "300px",
               objectFit: "cover",
             }}
           />
         </div>
-        <div className="col-md-8">
+        <div className="md:w-2/3 lg:w-3/4">
           {isEditing ? (
-            <div className="edit-form">
+            <div className="space-y-4">
               <input
                 type="text"
                 name="title"
-                className="form-control mb-2"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
                 value={editedBook.title}
                 onChange={handleInputChange}
                 placeholder="Book Title"
+                style={{ 
+                  backgroundColor: "var(--color-bg-secondary)", 
+                  color: "var(--color-text-primary)", 
+                  borderColor: "var(--color-border)",
+                  "--tw-ring-color": "var(--color-focus-ring)"
+                }}
               />
               <input
                 type="text"
                 name="author"
-                className="form-control mb-2"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
                 value={editedBook.author}
                 onChange={handleInputChange}
                 placeholder="Author"
+                style={{ 
+                  backgroundColor: "var(--color-bg-secondary)", 
+                  color: "var(--color-text-primary)", 
+                  borderColor: "var(--color-border)",
+                  "--tw-ring-color": "var(--color-focus-ring)"
+                }}
               />
               <input
                 type="text"
                 name="isbn"
-                className="form-control mb-2"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
                 value={editedBook.isbn}
                 onChange={handleInputChange}
                 placeholder="ISBN"
+                style={{ 
+                  backgroundColor: "var(--color-bg-secondary)", 
+                  color: "var(--color-text-primary)", 
+                  borderColor: "var(--color-border)",
+                  "--tw-ring-color": "var(--color-focus-ring)"
+                }}
               />
               <input
                 type="url"
                 name="image"
-                className="form-control mb-2"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
                 value={editedBook.image}
                 onChange={handleInputChange}
                 placeholder="Image URL"
+                style={{ 
+                  backgroundColor: "var(--color-bg-secondary)", 
+                  color: "var(--color-text-primary)", 
+                  borderColor: "var(--color-border)",
+                  "--tw-ring-color": "var(--color-focus-ring)"
+                }}
               />
               <textarea
                 name="description"
-                className="form-control mb-3"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
                 value={editedBook.description}
                 onChange={handleInputChange}
                 placeholder="Book Description"
                 rows="4"
+                style={{ 
+                  backgroundColor: "var(--color-bg-secondary)", 
+                  color: "var(--color-text-primary)", 
+                  borderColor: "var(--color-border)",
+                  "--tw-ring-color": "var(--color-focus-ring)"
+                }}
               />
-              <div className="d-flex gap-2">
+              <div className="flex flex-wrap gap-3">
                 <button 
-                  className="btn btn-success" 
+                  className="px-6 py-2 font-medium rounded-lg transition duration-200 disabled:opacity-50"
                   onClick={handleSaveEdit}
                   disabled={isSaving}
+                  style={{ 
+                    backgroundColor: "var(--color-button-primary)", 
+                    color: "var(--color-bg-primary)" 
+                  }}
                 >
                   {isSaving ? 'Saving...' : 'Save Changes'}
                 </button>
-                <button className="btn btn-secondary" onClick={handleEditToggle}>
+                <button 
+                  className="px-6 py-2 font-medium rounded-lg transition duration-200"
+                  onClick={handleEditToggle}
+                  style={{ 
+                    backgroundColor: "var(--color-secondary)",
+                    color: "var(--color-bg-primary)"
+                  }}
+                >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
             <>
-              <h3 className="fw-bold mb-3">{book.title}</h3>
-              <div className="d-flex gap-2 mb-3">
-                <span className="badge bg-primary">{book.author}</span>
-                <span className="badge bg-secondary">ISBN: {book.isbn}</span>
+              <h3 className="text-2xl font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>{book.title}</h3>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="px-3 py-1 rounded-full text-sm font-medium" style={{ 
+                  backgroundColor: "var(--color-secondary)", 
+                  color: "var(--color-bg-primary)" 
+                }}>
+                  {book.author}
+                </span>
+                <span className="px-3 py-1 rounded-full text-sm font-medium" style={{ 
+                  backgroundColor: "var(--color-button-primary)", 
+                  color: "var(--color-bg-primary)" 
+                }}>
+                  ISBN: {book.isbn}
+                </span>
               </div>
-              <p className="mb-4" style={{ maxHeight: "150px", overflowY: "auto" }}>
-                {book.description}
-              </p>
-              <div className="d-flex gap-2">
+              <div className="mb-6 max-h-40 overflow-y-auto pr-2" style={{ color: "var(--color-text-secondary)" }}>
+                <p>{book.description}</p>
+              </div>
+              <div className="flex flex-wrap gap-3">
                 {isAuthenticated() && (
-                  <div className="me-2">
+                  <>
                     {inLibrary ? (
-                      <button className="btn btn-warning" onClick={handleRemoveFromLibrary}>
+                      <button 
+                        className="px-4 py-2 font-medium rounded-lg transition duration-200"
+                        onClick={handleRemoveFromLibrary}
+                        style={{ 
+                          backgroundColor: "green", 
+                          color: "var(--color-bg-primary)" 
+                        }}
+                      >
                         Remove from Library
                       </button>
                     ) : (
-                      <button className="btn btn-success" onClick={handleAddToLibrary}>
+                      <button 
+                        className="px-4 py-2 font-medium rounded-lg transition duration-200"
+                        onClick={handleAddToLibrary}
+                        style={{ 
+                          backgroundColor: "green", 
+                          color: "var(--color-bg-primary)" 
+                        }}
+                      >
                         Add to Library
                       </button>
                     )}
-                  </div>
+                  </>
                 )}
                 
                 {isAuthenticated() && isTeacher() && (
-                  <div className="me-2">
-                    <button className="btn btn-primary me-2" onClick={handleEditToggle}>
+                  <>
+                    <button 
+                      className="px-4 py-2 font-medium rounded-lg transition duration-200"
+                      onClick={handleEditToggle}
+                      style={{ 
+                        backgroundColor: "yellow",
+                        color: "var(--color-text-primary)" 
+                      }}
+                    >
                       Edit Book
                     </button>
                     <button 
-                      className="btn btn-danger" 
+                      className="px-4 py-2 font-medium rounded-lg transition duration-200 disabled:opacity-50"
                       onClick={handleDelete}
                       disabled={isDeleting}
+                      style={{ 
+                        backgroundColor: "red",
+                        color: "var(--color-bg-primary)" 
+                      }}
                     >
                       {isDeleting ? 'Deleting...' : 'Delete Book'}
                     </button>
-                  </div>
+                  </>
                 )}
                 
-                <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+                <button 
+                  className="px-4 py-2 font-medium rounded-lg transition duration-200"
+                  onClick={() => navigate(-1)}
+                  style={{ 
+                    backgroundColor: "var(--color-bg-primary)", 
+                    borderColor: "var(--color-border)", 
+                    borderWidth: "1px",
+                    color: "var(--color-text-primary)"
+                  }}
+                >
                   Back to Catalog
                 </button>
               </div>

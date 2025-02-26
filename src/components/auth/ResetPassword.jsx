@@ -12,6 +12,7 @@ export default function ResetPassword() {
   });
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const token = searchParams.get('token');
 
   useEffect(() => {
@@ -64,34 +65,52 @@ export default function ResetPassword() {
       title="Reset Password"
       footerLink={{ to: '/login', text: 'Back to Login' }}
     >
-      <div className="mb-4">
-        <input 
-          type="password"
-          className="form-control bg-dark text-white mb-3"
-          placeholder="New Password"
-          value={formData.password}
-          onChange={e => setFormData({...formData, password: e.target.value})}
-          required
-        />
-        <input 
-          type="password"
-          className="form-control bg-dark text-white"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
-          required
-        />
+      <div className="mb-6">
+        <div className="relative">
+          <input 
+            type={showPassword ? 'text' : 'password'}
+            className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)] mb-3"
+            placeholder="New Password"
+            value={formData.password}
+            onChange={e => setFormData({...formData, password: e.target.value})}
+            required
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 px-3 py-2 text-sm text-[var(--color-text-light)] hover:text-[var(--color-text-primary)]"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
+        <div className="relative">
+          <input 
+            type={showPassword ? 'text' : 'password'}
+            className="w-full px-4 py-2 border rounded-lg text-[var(--color-text-primary)] bg-[var(--color-bg-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
+            required
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 px-3 py-2 text-sm text-[var(--color-text-light)] hover:text-[var(--color-text-primary)]"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
       </div>
       
       <button 
         type="submit"
-        className="btn btn-primary w-100 py-2"
+        className="w-full bg-[var(--color-button-primary)] text-white py-2 rounded-lg hover:bg-[var(--color-button-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-ring)]"
       >
         Reset Password
       </button>
 
-      {error && <div className="mt-3 alert alert-danger">{error}</div>}
-      {message && <div className="mt-3 alert alert-success">{message}</div>}
+      {error && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{error}</div>}
+      {message && <div className="mt-4 text-[var(--color-text-secondary)] text-sm">{message}</div>}
     </AuthForm>
   );
 }

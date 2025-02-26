@@ -46,65 +46,44 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark custom-navbar py-3">
-      <div className="container">
-        <Link to="/catalog" className="navbar-brand fw-bold fs-4">
-          <JournalBookmark className="me-2" />
-          BookCafe
+    <nav className="bg-[var(--color-primary)] shadow-md py-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link to="/catalog" className="text-2xl font-bold text-white flex items-center">
+          <JournalBookmark className="mr-2 text-white" />
+          <span className="text-white">Book</span>
+          <span className="text-[var(--color-text-light)]">Cafe</span>
         </Link>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-center gap-3">
-            {isLoggedIn ? (
-              <>
-                {userName && (
-                  <li className="nav-item">
-                  <NavLink to="/my-library" className="nav-link d-flex align-items-center gap-1">
-                    <PersonFill /> {userName.firstname}'s Library
-                  </NavLink>
-                </li>
-                )}
-                {userRole === 'teacher' && (
-                  <li className="nav-item">
-                    <NavLink to="/add-book" className="btn btn-primary d-flex align-items-center gap-1">
-                      <PlusCircle /> Add Book
-                    </NavLink>
-                  </li>
-                )}
-                <li className="nav-item">
-                  <button 
-                    onClick={handleLogout} 
-                    className="btn btn-link nav-link text-danger"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Logout
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="nav-item">
-                  <NavLink to="/login" className="nav-link">
-                    Login
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/register" className="btn btn-primary">
-                    Register
-                  </NavLink>
-                </li>
-              </>
-            )}
-          </ul>
+        <div className="flex items-center space-x-6">
+          {isLoggedIn ? (
+            <>
+              {userName && (
+                <NavLink to="/my-library" className="text-white hover:text-[var(--color-text-light)] flex items-center">
+                  <PersonFill className="mr-1" /> {userName.firstname}'s Library
+                </NavLink>
+              )}
+              {userRole === 'teacher' && (
+                <NavLink to="/add-book" className="bg-[var(--color-text-secondary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-text-light)] hover:text-white flex items-center transition duration-300">
+                  <PlusCircle className="mr-1" /> Add Book
+                </NavLink>
+              )}
+              <button 
+                onClick={handleLogout} 
+                className="text-white hover:text-[red] focus:outline-none transition duration-300"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" className="text-white hover:text-[var(--color-text-light)] transition duration-300">
+                Login
+              </NavLink>
+              <NavLink to="/register" className="bg-[var(--color-text-secondary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-text-light)] hover:text-white transition duration-300">
+                Register
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </nav>

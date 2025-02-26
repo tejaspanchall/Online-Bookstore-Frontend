@@ -3,24 +3,34 @@ import React from "react";
 const BookCard = ({ book, onClick, getImageUrl }) => {
   return (
     <div
-      className="book-card card h-100 border-0 overflow-hidden"
+      className="h-full border-0 overflow-hidden rounded shadow-md cursor-pointer transition duration-300 hover:shadow-lg"
+      style={{ backgroundColor: 'var(--color-bg-secondary)' }}
       onClick={onClick}
-      style={{ cursor: "pointer" }}
     >
-      <div className="position-relative">
+      <div className="relative">
         <img
           src={getImageUrl(book.image)}
           alt={book.title}
-          className="card-img-top"
+          className="w-full h-64 object-cover"
           loading="lazy"
-          style={{ height: "250px", objectFit: "cover" }}
         />
-        <div className="badge bg-primary position-absolute top-0 end-0 m-2">
+        <div 
+          className="absolute top-0 right-0 m-2 px-2 py-1 rounded text-sm font-medium"
+          style={{ 
+            backgroundColor: 'var(--color-secondary)',
+            color: 'var(--color-bg-primary)'
+          }}
+        >
           {book.author}
         </div>
       </div>
-      <div className="card-body">
-        <h5 className="card-title">{book.title}</h5>
+      <div className="p-3">
+        <h5 
+          className="font-bold"
+          style={{ color: 'var(--color-primary)' }}
+        >
+          {book.title}
+        </h5>
       </div>
     </div>
   );

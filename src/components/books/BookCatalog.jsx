@@ -114,92 +114,132 @@ export default function BookCatalog() {
   };
 
   return (
-    <div className="container py-5">
-      <div className="row mb-5">
-        <div className="col-lg-8 mx-auto">
-          <div className="input-group input-group-lg">
-            <span className="input-group-text bg-dark border-dark">
-              <Search />
-            </span>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search books..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && searchBooks()}
-            />
+    <div className="container mx-auto py-12 px-4" style={{ backgroundColor: "var(--color-bg-primary)", color: "var(--color-text-primary)" }}>
+      <div className="mb-12">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="flex-grow flex">
+              <span className="inline-flex items-center px-3 bg-black border border-black text-white rounded-l-lg" style={{ 
+                backgroundColor: "var(--color-secondary)", 
+                borderColor: "var(--color-secondary)",
+                color: "var(--color-bg-primary)"
+              }}>
+                <Search />
+              </span>
+              <input
+                type="text"
+                className="flex-grow px-4 py-3 border rounded-r-lg focus:outline-none focus:ring-2"
+                placeholder="Search books..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && searchBooks()}
+                style={{ 
+                  backgroundColor: "var(--color-bg-secondary)", 
+                  color: "var(--color-text-primary)", 
+                  borderColor: "var(--color-border)",
+                  "--tw-ring-color": "var(--color-focus-ring)"
+                }}
+              />
+            </div>
             <button 
               onClick={searchBooks} 
-              className="btn btn-primary px-4"
+              className="px-6 py-3 font-medium rounded-lg transition duration-200 disabled:opacity-50"
               disabled={isLoading}
+              style={{ 
+                backgroundColor: "var(--color-button-primary)", 
+                color: "var(--color-bg-primary)"
+              }}
             >
               {isLoading ? "Searching..." : "Search"}
             </button>
 
-            <div className="ms-3">
-              <div className="dropdown">
-                <button
-                  className="btn btn-primary dropdown-toggle px-4 h-12"
-                  type="button"
-                  id="filterDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  style={{ height: "50px" }}
-                >
-                  Filter
-                </button>
-                <ul className="dropdown-menu" aria-labelledby="filterDropdown">
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setFilter("asc");
-                      }}
-                    >
-                      A-Z
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setFilter("desc");
-                      }}
-                    >
-                      Z-A
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setFilter("recent");
-                      }}
-                    >
-                      Recently Added
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      className="dropdown-item"
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setFilter("last");
-                      }}
-                    >
-                      Last Added
-                    </a>
-                  </li>
-                </ul>
-              </div>
+            <div className="relative inline-block">
+              <button
+                className="px-6 py-3 font-medium rounded-lg transition duration-200"
+                type="button"
+                id="filterDropdown"
+                aria-expanded="false"
+                onClick={() => {
+                  const dropdown = document.getElementById('filterDropdownMenu');
+                  dropdown.classList.toggle('hidden');
+                }}
+                style={{ 
+                  backgroundColor: "var(--color-secondary)",
+                  color: "var(--color-bg-primary)"
+                }}
+              >
+                Filter
+              </button>
+              <ul 
+                id="filterDropdownMenu"
+                className="hidden absolute z-10 mt-1 w-40 rounded-lg shadow-lg py-1"
+                style={{ backgroundColor: "var(--color-bg-secondary)" }}
+              >
+                <li>
+                  <a
+                    className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    style={{ 
+                      color: "var(--color-text-primary)",
+                      "&:hover": { backgroundColor: "var(--color-border)" }
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFilter("asc");
+                      document.getElementById('filterDropdownMenu').classList.add('hidden');
+                    }}
+                  >
+                    A-Z
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    style={{ 
+                      color: "var(--color-text-primary)",
+                      "&:hover": { backgroundColor: "var(--color-border)" }
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFilter("desc");
+                      document.getElementById('filterDropdownMenu').classList.add('hidden');
+                    }}
+                  >
+                    Z-A
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    style={{ 
+                      color: "var(--color-text-primary)",
+                      "&:hover": { backgroundColor: "var(--color-border)" }
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFilter("recent");
+                      document.getElementById('filterDropdownMenu').classList.add('hidden');
+                    }}
+                  >
+                    Recently Added
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="block px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    style={{ 
+                      color: "var(--color-text-primary)",
+                      "&:hover": { backgroundColor: "var(--color-border)" }
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFilter("last");
+                      document.getElementById('filterDropdownMenu').classList.add('hidden');
+                    }}
+                  >
+                    Last Added
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -207,29 +247,30 @@ export default function BookCatalog() {
 
       {message && (
         <div
-          className={`alert ${
-            message.includes("success") ? "alert-success" : "alert-danger"
-          } mb-4`}
+          className="p-4 mb-6 rounded-lg"
+          style={{ 
+            backgroundColor: message.includes("success") ? "rgba(var(--color-bg-secondary), 0.2)" : "rgba(var(--color-accent), 0.2)",
+            color: message.includes("success") ? "var(--color-text-secondary)" : "var(--color-text-light)"
+          }}
         >
           {message}
         </div>
       )}
 
       {isLoading ? (
-        <div className="text-center mt-4">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+        <div className="text-center mt-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-transparent" style={{ borderColor: "var(--color-accent)" }}></div>
+          <span className="sr-only">Loading...</span>
         </div>
       ) : displayedBooks.length === 0 ? (
-        <div className="text-center mt-4">
-          <p className="text-muted">No books found</p>
+        <div className="text-center mt-8">
+          <p style={{ color: "var(--color-text-secondary)" }}>No books found</p>
         </div>
       ) : (
         <>
-          <div className="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
             {displayedBooks.map((book) => (
-              <div className="col" key={book.id}>
+              <div key={book.id}>
                 <BookCard
                   book={book}
                   onClick={() => handleBookClick(book.id)}

@@ -84,7 +84,12 @@ export default function AddBook() {
       <div className="mb-3">
         <input
           type="text"
-          className="form-control bg-dark text-white"
+          className="w-full p-2 bg-white rounded border focus:outline-none"
+          style={{ 
+            color: 'var(--color-text-primary)',
+            borderColor: 'var(--color-border)',
+            borderWidth: '1px',
+          }}
           placeholder="Title"
           value={book.title}
           onChange={(e) => setBook({ ...book, title: e.target.value })}
@@ -94,7 +99,12 @@ export default function AddBook() {
       <div className="mb-3">
         <input
           type="url"
-          className="form-control bg-dark text-white"
+          className="w-full p-2 bg-white rounded border focus:outline-none"
+          style={{ 
+            color: 'var(--color-text-primary)',
+            borderColor: 'var(--color-border)',
+            borderWidth: '1px',
+          }}
           placeholder="Image URL"
           value={book.image}
           onChange={(e) => setBook({ ...book, image: e.target.value })}
@@ -103,7 +113,12 @@ export default function AddBook() {
       </div>
       <div className="mb-3">
         <textarea
-          className="form-control bg-dark text-white"
+          className="w-full p-2 bg-white rounded border focus:outline-none"
+          style={{ 
+            color: 'var(--color-text-primary)',
+            borderColor: 'var(--color-border)',
+            borderWidth: '1px',
+          }}
           placeholder="Description"
           value={book.description}
           onChange={(e) => setBook({ ...book, description: e.target.value })}
@@ -114,7 +129,12 @@ export default function AddBook() {
       <div className="mb-3">
         <input
           type="text"
-          className="form-control bg-dark text-white"
+          className="w-full p-2 bg-white rounded border focus:outline-none"
+          style={{ 
+            color: 'var(--color-text-primary)',
+            borderColor: 'var(--color-border)',
+            borderWidth: '1px',
+          }}
           placeholder="ISBN"
           value={book.isbn}
           onChange={(e) => setBook({ ...book, isbn: e.target.value })}
@@ -124,7 +144,12 @@ export default function AddBook() {
       <div className="mb-3">
         <input
           type="text"
-          className="form-control bg-dark text-white"
+          className="w-full p-2 bg-white rounded border focus:outline-none"
+          style={{ 
+            color: 'var(--color-text-primary)',
+            borderColor: 'var(--color-border)',
+            borderWidth: '1px',
+          }}
           placeholder="Author"
           value={book.author}
           onChange={(e) => setBook({ ...book, author: e.target.value })}
@@ -133,13 +158,19 @@ export default function AddBook() {
       </div>
       <button 
         type="submit" 
-        className="btn btn-primary w-100 py-2"
+        className="w-full py-2 rounded transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{ 
+          backgroundColor: isLoading ? 'var(--color-text-light)' : 'var(--color-button-primary)',
+          color: 'var(--color-bg-primary)', 
+        }}
+        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-hover)'}
+        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--color-button-primary)'}
         disabled={isLoading}
       >
         {isLoading ? 'Adding Book...' : 'Add Book'}
       </button>
       {message && (
-        <div className={`mt-3 alert ${isError ? 'alert-danger' : 'alert-success'}`}>
+        <div className={`mt-3 p-3 rounded ${isError ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-700 border border-green-200'}`}>
           {message}
         </div>
       )}
